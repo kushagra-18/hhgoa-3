@@ -32,10 +32,11 @@ class Settings(BaseSettings):
     BLOCKCHAIN_PRIVATE_KEY: str = ""
     BLOCKCHAIN_CONTRACT_ADDRESS: str = ""
 
-    # Search APIs
+    # Search & Crawling APIs
     SERPAPI_API_KEY: str = ""
     SERPER_API_KEY: str = ""
     TAVILY_API_KEY: str = ""
+    FIRECRAWL_API_KEY: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env",

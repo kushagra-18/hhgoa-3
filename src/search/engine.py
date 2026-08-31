@@ -11,6 +11,7 @@ from src.search.providers import (
     BaseSearchProvider,
     SerpApiLensProvider,
     SerperVisualProvider,
+    FirecrawlSearchProvider,
     LiveOpenWebSearchProvider,
     RealisticFixtureProvider,
 )
@@ -36,7 +37,8 @@ class SearchEngine:
             self.providers = [
                 SerpApiLensProvider(),
                 SerperVisualProvider(),
-                LiveOpenWebSearchProvider(),  # Genuine live real-time web search
+                FirecrawlSearchProvider(),    # Firecrawl AI web crawler & search
+                LiveOpenWebSearchProvider(),  # Genuine live real-time open web search
                 RealisticFixtureProvider(),   # Offline fallback
             ]
 
