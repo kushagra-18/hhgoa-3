@@ -7,14 +7,7 @@ import requests
 from src.config import settings
 from src.face.detector import FaceDetector, FaceDetectionResult
 from src.search.social_parser import DiscoveredPost
-from src.search.providers import (
-    BaseSearchProvider,
-    SerpApiLensProvider,
-    SerperVisualProvider,
-    FirecrawlSearchProvider,
-    LiveOpenWebSearchProvider,
-    RealisticFixtureProvider,
-)
+from src.search.providers import BaseSearchProvider, SearchProviderFactory
 
 logger = logging.getLogger("search_engine")
 
@@ -31,16 +24,7 @@ class SearchEngine:
         providers: Optional[List[BaseSearchProvider]] = None,
     ):
         self.face_detector = face_detector or FaceDetector()
-        if providers:
-            self.providers = providers
-        else:
-            self.providers = [
-                SerpApiLensProvider(),
-                SerperVisualProvider(),
-                FirecrawlSearchProvider(),    # Firecrawl AI web crawler & search
-                LiveOpenWebSearchProvider(),  # Genuine live real-time open web search
-                RealisticFixtureProvider(),   # Offline fallback
-            ]
+        self.providers = providers or SearchProviderFactory.get_enabled_providers()
 
     def search_for_matching_post(
         self,

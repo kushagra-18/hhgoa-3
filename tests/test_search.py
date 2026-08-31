@@ -1,6 +1,12 @@
 import pytest
 from src.search.social_parser import DiscoveredPost, SocialPostParser
-from src.search.providers import RealisticFixtureProvider
+from src.search.providers import (
+    SearchProviderFactory,
+    BaseSearchProvider,
+    RealisticFixtureProvider,
+    LiveOpenWebSearchProvider,
+    FirecrawlSearchProvider,
+)
 from src.search.engine import SearchEngine
 
 
@@ -48,3 +54,40 @@ def test_realistic_fixture_search():
     assert post.platform in ["Twitter/X", "LinkedIn", "Reddit", "Instagram", "Wikipedia", "GitHub", "Web"]
     assert post.author_name != ""
     assert post.post_url.startswith("http")
+
+
+def test_search_provider_factory_creation():
+    # Test factory instantiation of registered providers
+    fixture_provider = SearchProviderFactory.create("fixture")
+    assert isinstance(fixture_provider, RealisticFixtureProvider)
+    assert fixture_provider.name == "RealisticFixtureProvider"
+
+    open_web_provider = SearchProviderFactory.create("open_web")
+    assert isinstance(open_web_provider, LiveOpenWebSearchProvider)
+    assert open_web_provider.name == "LiveOpenWebSearchProvider"
+
+    firecrawl_provider = SearchProviderFactory.create("firecrawl")
+    assert isinstance(firecrawl_provider, FirecrawlSearchProvider)
+
+    # Test unknown provider error handling
+    with pytest.raises(ValueError, match="Unknown search provider"):
+        SearchProviderFactory.create("non_existent_provider")
+
+
+def test_search_provider_factory_custom_registration():
+    class CustomTestProvider(BaseSearchProvider):
+        def search(self, image_path, image_bytes=None):
+            return []
+
+    SearchProviderFactory.register("custom_mock", CustomTestProvider)
+    assert "custom_mock" in SearchProviderFactory.list_available_providers()
+    instance = SearchProviderFactory.create("custom_mock")
+    assert isinstance(instance, CustomTestProvider)
+
+
+def test_search_provider_factory_enabled_chain():
+    enabled = SearchProviderFactory.get_enabled_providers()
+    assert len(enabled) >= 2  # at minimum LiveOpenWebSearchProvider and RealisticFixtureProvider
+    provider_names = [p.name for p in enabled]
+    assert "LiveOpenWebSearchProvider" in provider_names
+    assert "RealisticFixtureProvider" in provider_names
