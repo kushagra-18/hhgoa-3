@@ -34,15 +34,17 @@ services:
       - DATABASE_URL=postgresql://postgres:postgrespassword@db:5432/face_verification_db
       - INSIGHTFACE_MODEL_NAME=buffalo_l
       - INSIGHTFACE_DET_SIZE=640
-      - APP_ENV=production
-      - DEBUG=False
+      - APP_ENV=development
+      - DEBUG=True
       - HOST=0.0.0.0
       - PORT=8000
+    command: uvicorn src.api.app:app --host 0.0.0.0 --port 8000 --reload
     volumes:
       - ./src:/app/src
       - ./tests:/app/tests
       - ./contracts:/app/contracts
       - ./data:/app/data
+      - ./models:/app/models
       - ./models:/root/.insightface/models
 
 volumes:
