@@ -1,0 +1,23 @@
+# Python bytecode & environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.coverage
+
+# Persistent models & weights
+models/
+
+# Dynamic runtime data & caches (keep samples directory)
+data/uploads/
+data/crops/
+data/cache/
+data/*.db
+data/*.sqlite
+
+# Environment secrets
+.env
+.DS_Store
