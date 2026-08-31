@@ -244,10 +244,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // Step 1
     const scan = res.face_scan || {};
     if (scan.crop_image_path) {
-      faceCropImg.src = scan.crop_image_path.replace("./data", "/data-files").replace("data/", "/data-files/");
+      const cropFilename = scan.crop_image_path.split("/").pop();
+      faceCropImg.src = `/data-files/crops/${cropFilename}`;
     } else {
       faceCropImg.src = imagePreview.src;
     }
+    faceCropImg.onerror = () => {
+      faceCropImg.src = imagePreview.src;
+    };
     faceConfidenceBadge.textContent = `Confidence: ${(scan.face_confidence || 0.99) * 100}%`;
     faceBboxVal.textContent = JSON.stringify(scan.bbox || [140, 92, 380, 410]);
     faceShaVal.textContent = scan.image_sha256 || "-";
