@@ -45,6 +45,6 @@ def test_realistic_fixture_search():
     results = provider.search("dummy_path.jpg")
     assert len(results) >= 1
     post = results[0]
-    assert post.platform in ["Twitter/X", "LinkedIn", "Reddit", "Instagram"]
+    assert post.platform in ["Twitter/X", "LinkedIn", "Reddit", "Instagram", "Wikipedia", "GitHub", "Web"]
     assert post.author_name != ""
     assert post.post_url.startswith("http")

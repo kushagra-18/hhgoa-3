@@ -11,6 +11,7 @@ from src.search.providers import (
     BaseSearchProvider,
     SerpApiLensProvider,
     SerperVisualProvider,
+    LiveOpenWebSearchProvider,
     RealisticFixtureProvider,
 )
 
@@ -35,7 +36,8 @@ class SearchEngine:
             self.providers = [
                 SerpApiLensProvider(),
                 SerperVisualProvider(),
-                RealisticFixtureProvider(), # Always available fallback
+                LiveOpenWebSearchProvider(),  # Genuine live real-time web search
+                RealisticFixtureProvider(),   # Offline fallback
             ]
 
     def search_for_matching_post(
