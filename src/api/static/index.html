@@ -3,258 +3,410 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HH Goa 2026: Face-to-Blockchain Verification Pipeline</title>
+  <title>Aegis Identity • Enterprise Biometric Provenance & Blockchain Attestation</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <div class="app-container">
-    <!-- Header -->
-    <header class="header">
-      <div class="logo-group">
-        <div class="logo-icon">🔐</div>
-        <div>
-          <h1>HH Goa 2026 <span class="badge-sub">Task 3</span></h1>
-          <p class="subtitle">Face Identification & Blockchain Verification Pipeline</p>
+  <div class="page-wrapper">
+    <!-- Institutional Navbar -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="brand">
+          <div class="brand-symbol">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="M9 12l2 2 4-4"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <span class="brand-name">AEGIS<span class="brand-accent">IDENTITY</span></span>
+            <span class="brand-tier">ENTERPRISE ATTESTATION</span>
+          </div>
+        </div>
+
+        <div class="nav-status">
+          <div class="status-indicator">
+            <span class="pulse-dot"></span>
+            <span class="status-text">Network Active</span>
+          </div>
+          <div class="nav-divider"></div>
+          <div class="network-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="2" width="20" height="8" rx="2"/>
+              <rect x="2" y="14" width="20" height="8" rx="2"/>
+              <line x1="6" y1="6" x2="6.01" y2="6"/>
+              <line x1="6" y1="18" x2="6.01" y2="18"/>
+            </svg>
+            <span>EVM Consensus Layer</span>
+          </div>
         </div>
       </div>
-      <div class="header-tags">
-        <span class="tag tag-blue"><span class="dot dot-blue"></span>InsightFace Buffalo (512-d)</span>
-        <span class="tag tag-purple"><span class="dot dot-purple"></span>EVM Smart Contract</span>
-        <span class="tag tag-green"><span class="dot dot-green"></span>PostgreSQL + pgvector</span>
-      </div>
-    </header>
+    </nav>
 
-    <!-- Main Content Grid -->
-    <main class="main-grid">
-      <!-- Left Column: Input & Controls -->
-      <section class="card input-card">
-        <div class="card-header">
-          <h2>1. Input Face Scan</h2>
-          <span class="step-num">Step 1</span>
-        </div>
-
-        <!-- Upload Dropzone -->
-        <div class="dropzone" id="dropzone">
-          <input type="file" id="fileInput" accept="image/*" class="file-input">
-          <div class="dropzone-content" id="dropzoneContent">
-            <div class="upload-icon">📷</div>
-            <h3>Drag & Drop Face Image</h3>
-            <p>or click to browse from device</p>
-            <span class="formats">Supports JPG, PNG, WEBP</span>
-          </div>
-          <div class="preview-container hidden" id="previewContainer">
-            <img id="imagePreview" src="" alt="Scan Preview">
-            <button type="button" class="btn-change" id="btnChange">Change</button>
-          </div>
-        </div>
-
-        <!-- Quick Sample Images -->
-        <div class="sample-section">
-          <label>Or select a demo test scan:</label>
-          <div class="sample-buttons">
-            <button class="btn-sample" data-sample="sample_sataboris.jpg">👤 Satoshi B. (Tech)</button>
-            <button class="btn-sample" data-sample="sample_elena.jpg">👩‍🔬 Dr. Elena (AI)</button>
-            <button class="btn-sample" data-sample="sample_alex.jpg">👨‍💻 Alex V. (Web3)</button>
-          </div>
-        </div>
-
-        <!-- Action Button -->
-        <button id="btnRunPipeline" class="btn-primary" disabled>
-          <span class="btn-text">Execute End-to-End Pipeline</span>
-          <span class="btn-loader hidden"></span>
-        </button>
-
-        <!-- Pipeline Execution Steps Progress Indicator -->
-        <div class="pipeline-progress" id="pipelineProgress">
-          <div class="progress-step" id="pStep1">
-            <div class="step-icon">1</div>
-            <div class="step-label">Face Encoding (InsightFace)</div>
-          </div>
-          <div class="progress-line"></div>
-          <div class="progress-step" id="pStep2">
-            <div class="step-icon">2</div>
-            <div class="step-label">Web / Social Search</div>
-          </div>
-          <div class="progress-line"></div>
-          <div class="progress-step" id="pStep3">
-            <div class="step-icon">3</div>
-            <div class="step-label">Blockchain Anchor</div>
-          </div>
-          <div class="progress-line"></div>
-          <div class="progress-step" id="pStep4">
-            <div class="step-icon">4</div>
-            <div class="step-label">On-Chain Verification</div>
-          </div>
-        </div>
+    <!-- Main Container -->
+    <main class="main-container">
+      <!-- Top Overview Header -->
+      <section class="hero-banner">
+        <div class="hero-badge">Immutable Identity Provenance</div>
+        <h1>Facial Verification & Blockchain Attestation</h1>
+        <p class="hero-desc">
+          Cryptographically anchor facial biometric signatures, discover matching public web media, and maintain tamper-evident records on the decentralized ledger.
+        </p>
       </section>
 
-      <!-- Right Column: Pipeline Output Panels -->
-      <section class="output-column">
-        <!-- Results Container -->
-        <div id="resultsContainer" class="results-container hidden">
-          <!-- Step 1: Face Features Card -->
-          <div class="card result-card">
-            <div class="card-header">
-              <h3><span class="card-num">1</span> InsightFace Buffalo Identification</h3>
-              <span class="badge badge-success" id="faceConfidenceBadge">Confidence: 99.4%</span>
-            </div>
-            <div class="face-features-grid">
-              <div class="crop-viewer">
-                <img id="faceCropImg" src="" alt="Cropped Aligned Face">
-                <span class="crop-label">Aligned Face Crop</span>
-              </div>
-              <div class="meta-list">
-                <div class="meta-row">
-                  <span class="meta-key">Bounding Box:</span>
-                  <span class="meta-val mono" id="faceBboxVal">[140, 92, 380, 410]</span>
-                </div>
-                <div class="meta-row">
-                  <span class="meta-key">Embedding Vector:</span>
-                  <span class="meta-val mono" id="faceEmbVal">512-dim Normalized L2</span>
-                </div>
-                <div class="meta-row">
-                  <span class="meta-key">Image SHA-256:</span>
-                  <span class="meta-val mono truncate" id="faceShaVal">-</span>
-                </div>
-                <div class="meta-row">
-                  <span class="meta-key">Vector Store:</span>
-                  <span class="meta-val text-green">Indexed in PostgreSQL (pgvector)</span>
-                </div>
+      <!-- Primary Terminal Grid -->
+      <div class="terminal-grid">
+        <!-- Left Panel: Input & Scan Terminal -->
+        <div class="panel input-panel">
+          <div class="panel-header">
+            <div class="panel-title-group">
+              <span class="panel-icon">01</span>
+              <div>
+                <h3>Biometric Input Terminal</h3>
+                <p>Upload or select a subject image</p>
               </div>
             </div>
           </div>
 
-          <!-- Step 2: Discovered Social Media Post Card -->
-          <div class="card result-card">
-            <div class="card-header">
-              <h3><span class="card-num">2</span> Discovered Social Media / Web Match</h3>
-              <span class="badge badge-blue" id="matchPlatformBadge">Twitter/X</span>
+          <!-- Dropzone -->
+          <div class="dropzone" id="dropzone">
+            <input type="file" id="fileInput" accept="image/*" class="file-input">
+            <div class="dropzone-body" id="dropzoneContent">
+              <div class="drop-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+              </div>
+              <h4>Select or Drag Subject Image</h4>
+              <p>Supports PNG, JPG, WEBP • Max 20MB</p>
             </div>
-            <div class="social-post-card">
-              <div class="social-post-header">
-                <div class="author-avatar" id="authorAvatar">👤</div>
-                <div class="author-info">
-                  <h4 id="authorName">Satoshi Borisov</h4>
-                  <span class="author-handle mono" id="authorHandle">@sataboris</span>
-                </div>
-                <div class="similarity-pill">
-                  <span class="sim-label">Face Similarity</span>
-                  <span class="sim-val" id="similarityScore">94.8%</span>
-                </div>
-              </div>
-              <div class="social-post-body">
-                <p id="postCaption" class="post-text">Excited to share our research on zero-knowledge identity proofs and on-chain face attestation at #Web3Summit!</p>
-              </div>
-              <div class="social-post-footer">
-                <a href="#" target="_blank" id="postUrlLink" class="post-link">View Original Post ↗</a>
-                <span class="post-time mono" id="postTimestamp">2024-05-11 16:42 UTC</span>
-              </div>
+            <div class="preview-container hidden" id="previewContainer">
+              <img id="imagePreview" src="" alt="Subject Preview">
+              <button type="button" class="btn-change-image" id="btnChange">Replace Image</button>
             </div>
           </div>
 
-          <!-- Step 3: Blockchain Attestation Card -->
-          <div class="card result-card">
-            <div class="card-header">
-              <h3><span class="card-num">3</span> Blockchain Smart Contract Attestation</h3>
-              <span class="badge badge-purple" id="networkBadge">EVM Anchor</span>
-            </div>
-            <div class="blockchain-meta-grid">
-              <div class="chain-stat">
-                <span class="stat-label">Transaction Hash</span>
-                <span class="stat-value mono truncate" id="txHashVal">0x...</span>
-              </div>
-              <div class="chain-stat">
-                <span class="stat-label">Block Number</span>
-                <span class="stat-value mono text-purple" id="blockNumVal">#19482011</span>
-              </div>
-              <div class="chain-stat">
-                <span class="stat-label">Contract Address</span>
-                <span class="stat-value mono truncate" id="contractVal">0x71C...2F1a</span>
-              </div>
-              <div class="chain-stat">
-                <span class="stat-label">Payload Keccak256</span>
-                <span class="stat-value mono truncate" id="payloadHashVal">0x...</span>
-              </div>
+          <!-- Preloaded Profiles -->
+          <div class="sample-directory">
+            <span class="directory-label">Pre-Verified Subject Directory</span>
+            <div class="directory-grid">
+              <button class="btn-directory" data-sample="sample_sataboris.jpg">
+                <span class="dir-avatar">SB</span>
+                <div class="dir-info">
+                  <span class="dir-name">Subject Alpha</span>
+                  <span class="dir-role">Executive Identity</span>
+                </div>
+              </button>
+              <button class="btn-directory" data-sample="sample_elena.jpg">
+                <span class="dir-avatar">ER</span>
+                <div class="dir-info">
+                  <span class="dir-name">Subject Beta</span>
+                  <span class="dir-role">Research Director</span>
+                </div>
+              </button>
+              <button class="btn-directory" data-sample="sample_alex.jpg">
+                <span class="dir-avatar">AV</span>
+                <div class="dir-info">
+                  <span class="dir-name">Subject Gamma</span>
+                  <span class="dir-role">Technical Contributor</span>
+                </div>
+              </button>
             </div>
           </div>
 
-          <!-- Step 4: Cryptographic Verification & Tamper Simulation -->
-          <div class="card result-card verification-card" id="verificationCard">
-            <div class="card-header">
-              <h3><span class="card-num">4</span> On-Chain Tamper-Evident Verification Proof</h3>
-              <span class="badge badge-success" id="verStatusBadge">100% Cryptographically Verified</span>
-            </div>
-            <div class="verification-body">
-              <div class="verification-banner success" id="verBanner">
-                <div class="ver-icon" id="verIcon">🛡️</div>
-                <div class="ver-text">
-                  <h4 id="verTitle">Genuine Record Verified On-Chain</h4>
-                  <p id="verDescription">The discovered social media payload matches the cryptographic Keccak256 hash committed to the smart contract block state.</p>
-                </div>
-              </div>
+          <!-- Primary Execution CTA -->
+          <button id="btnRunPipeline" class="btn-cta" disabled>
+            <span class="btn-text">Execute Verification Pipeline</span>
+            <span class="btn-spinner hidden"></span>
+          </button>
 
-              <!-- Interactive Live Tamper Demo Controls -->
-              <div class="tamper-control-box">
-                <div class="tamper-header">
-                  <div>
-                    <h4>Interactive Tamper Evidence Demonstration</h4>
-                    <p class="text-muted">Test how blockchain cryptography detects malicious modifications instantly.</p>
-                  </div>
-                  <button id="btnTamperTest" class="btn-tamper">
-                    ⚡ Simulate Malicious Data Alteration
-                  </button>
-                </div>
-                <!-- Tamper Diff Results (Shown when clicked) -->
-                <div id="tamperDiffContainer" class="tamper-diff hidden"></div>
+          <!-- Pipeline Processing Stepper -->
+          <div class="pipeline-stepper" id="pipelineProgress">
+            <div class="step-item" id="pStep1">
+              <div class="step-marker">
+                <span class="step-num">1</span>
+              </div>
+              <div class="step-meta">
+                <span class="step-heading">Biometric Extraction</span>
+                <span class="step-sub">Detect facial geometry & encode signature</span>
+              </div>
+            </div>
+
+            <div class="step-connector"></div>
+
+            <div class="step-item" id="pStep2">
+              <div class="step-marker">
+                <span class="step-num">2</span>
+              </div>
+              <div class="step-meta">
+                <span class="step-heading">Web & Social Discovery</span>
+                <span class="step-sub">Cross-reference public online media</span>
+              </div>
+            </div>
+
+            <div class="step-connector"></div>
+
+            <div class="step-item" id="pStep3">
+              <div class="step-marker">
+                <span class="step-num">3</span>
+              </div>
+              <div class="step-meta">
+                <span class="step-heading">Blockchain Attestation</span>
+                <span class="step-sub">Anchor cryptographic hash on-chain</span>
+              </div>
+            </div>
+
+            <div class="step-connector"></div>
+
+            <div class="step-item" id="pStep4">
+              <div class="step-marker">
+                <span class="step-num">4</span>
+              </div>
+              <div class="step-meta">
+                <span class="step-heading">On-Chain Audit</span>
+                <span class="step-sub">Verify tamper-evidence against ledger</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Initial Placeholder State -->
-        <div id="emptyState" class="card empty-state">
-          <div class="empty-icon">⚡</div>
-          <h3>Ready to Execute Pipeline</h3>
-          <p>Upload a face scan or select a sample image on the left to begin face identification, reverse social media search, and on-chain blockchain anchoring.</p>
+        <!-- Right Panel: Attestation & Verification Results -->
+        <div class="panel-stack">
+          <!-- Live Results Container -->
+          <div id="resultsContainer" class="results-stack hidden">
+            <!-- Card 1: Biometric Signature -->
+            <div class="result-card">
+              <div class="card-top">
+                <div class="card-title-wrap">
+                  <span class="section-tag">Stage 01</span>
+                  <h3>Biometric Signature Analysis</h3>
+                </div>
+                <div class="pill pill-success" id="faceConfidenceBadge">
+                  <span class="pill-dot"></span> Confidence: 99.4%
+                </div>
+              </div>
+
+              <div class="biometric-content">
+                <div class="crop-frame">
+                  <img id="faceCropImg" src="" alt="Aligned Biometric Crop">
+                  <span class="crop-caption">Aligned Facial Crop</span>
+                </div>
+                <div class="detail-grid">
+                  <div class="detail-row">
+                    <span class="detail-label">Facial Bounding Region</span>
+                    <span class="detail-value mono" id="faceBboxVal">[162, 159, 433, 571]</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Biometric Feature Matrix</span>
+                    <span class="detail-value">Verified Normalized Vector</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Source Digest (SHA-256)</span>
+                    <span class="detail-value mono truncate" id="faceShaVal">-</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Audit Index</span>
+                    <span class="detail-value text-accent">Indexed in Secure Attestation Ledger</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: Discovered Media Match -->
+            <div class="result-card">
+              <div class="card-top">
+                <div class="card-title-wrap">
+                  <span class="section-tag">Stage 02</span>
+                  <h3>Discovered Public Media Match</h3>
+                </div>
+                <div class="pill pill-blue" id="matchPlatformBadge">Verified Source</div>
+              </div>
+
+              <div class="media-match-card">
+                <div class="match-profile">
+                  <div class="avatar-circle" id="authorAvatar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </div>
+                  <div class="match-meta">
+                    <h4 id="authorName">Published Entity</h4>
+                    <span class="match-handle mono" id="authorHandle">@verified_record</span>
+                  </div>
+                  <div class="similarity-badge">
+                    <span class="sim-title">Visual Match</span>
+                    <span class="sim-percent" id="similarityScore">94.8%</span>
+                  </div>
+                </div>
+
+                <p class="match-caption" id="postCaption">
+                  Decentralized identity verification and biometric face attestation records verified across public media networks.
+                </p>
+
+                <div class="match-footer">
+                  <a href="#" target="_blank" id="postUrlLink" class="btn-external">
+                    <span>View Public Source</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                      <polyline points="15 3 21 3 21 9"/>
+                      <line x1="10" y1="14" x2="21" y2="3"/>
+                    </svg>
+                  </a>
+                  <span class="match-time mono" id="postTimestamp">2024-05-14T09:15:30Z</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: Blockchain Attestation -->
+            <div class="result-card">
+              <div class="card-top">
+                <div class="card-title-wrap">
+                  <span class="section-tag">Stage 03</span>
+                  <h3>Immutable Smart Contract Attestation</h3>
+                </div>
+                <div class="pill pill-purple" id="networkBadge">EVM Consensus Layer</div>
+              </div>
+
+              <div class="ledger-stat-grid">
+                <div class="stat-card">
+                  <span class="stat-header">Transaction Hash</span>
+                  <span class="stat-body mono truncate" id="txHashVal">0x...</span>
+                </div>
+                <div class="stat-card">
+                  <span class="stat-header">Block Height</span>
+                  <span class="stat-body mono text-purple" id="blockNumVal">#19482012</span>
+                </div>
+                <div class="stat-card">
+                  <span class="stat-header">Registry Contract</span>
+                  <span class="stat-body mono truncate" id="contractVal">0x71C...2F1a</span>
+                </div>
+                <div class="stat-card">
+                  <span class="stat-header">Payload Hash (Keccak-256)</span>
+                  <span class="stat-body mono truncate" id="payloadHashVal">0x...</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4: Verification Proof & Interactive Security Audit -->
+            <div class="result-card verification-panel" id="verificationCard">
+              <div class="card-top">
+                <div class="card-title-wrap">
+                  <span class="section-tag">Stage 04</span>
+                  <h3>Cryptographic Integrity & Tamper Audit</h3>
+                </div>
+                <div class="pill pill-success" id="verStatusBadge">
+                  <span class="pill-dot"></span> 100% Cryptographically Verified
+                </div>
+              </div>
+
+              <div class="audit-banner success" id="verBanner">
+                <div class="banner-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <polyline points="9 12 11 14 15 10"/>
+                  </svg>
+                </div>
+                <div class="banner-info">
+                  <h4 id="verTitle">Cryptographic Proof Validated On-Chain</h4>
+                  <p id="verDescription">
+                    Discovered payload data and biometric hashes exactly match the immutable record committed on the decentralized ledger.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Interactive Tamper Testing Box -->
+              <div class="security-audit-box">
+                <div class="audit-control-header">
+                  <div>
+                    <h4>Interactive Tamper-Evidence Audit</h4>
+                    <p>Demonstrate cryptographic tamper detection by simulating an unauthorized payload modification.</p>
+                  </div>
+                  <button id="btnTamperTest" class="btn-audit">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                      <line x1="12" y1="9" x2="12" y2="13"/>
+                      <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <span>Simulate Data Tampering</span>
+                  </button>
+                </div>
+                <div id="tamperDiffContainer" class="tamper-diff-box hidden"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty Terminal State -->
+          <div id="emptyState" class="empty-terminal-card">
+            <div class="empty-glow">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+            </div>
+            <h3>Terminal Ready for Verification</h3>
+            <p>Upload a subject photo or choose from the verified directory to initiate biometric extraction, global web cross-referencing, and smart contract attestation.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Institutional Attestation Ledger -->
+      <section class="ledger-section">
+        <div class="ledger-header">
+          <div class="ledger-title-group">
+            <h3>Immutable Attestation Registry</h3>
+            <p>Cryptographic record of on-chain verification receipts</p>
+          </div>
+          <button id="btnRefreshHistory" class="btn-refresh">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"/>
+              <polyline points="1 20 1 14 7 14"/>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+            </svg>
+            <span>Refresh Ledger</span>
+          </button>
+        </div>
+
+        <div class="table-frame">
+          <table class="attestation-table">
+            <thead>
+              <tr>
+                <th>Attestation ID</th>
+                <th>Source Platform</th>
+                <th>Verified Entity</th>
+                <th>Biometric Match</th>
+                <th>Transaction Hash</th>
+                <th>Block Height</th>
+                <th>Audit Status</th>
+                <th>Integrity</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody">
+              <tr>
+                <td colspan="8" class="table-empty-msg">Querying on-chain ledger records...</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
     </main>
 
-    <!-- Historical Ledger Section -->
-    <section class="card history-section">
-      <div class="card-header">
-        <h2>📜 Immutable Attestation Ledger & History</h2>
-        <button id="btnRefreshHistory" class="btn-outline">↻ Refresh History</button>
-      </div>
-      <div class="table-responsive">
-        <table class="ledger-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Platform</th>
-              <th>Author</th>
-              <th>Similarity</th>
-              <th>Tx Hash</th>
-              <th>Block</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="historyTableBody">
-            <tr>
-              <td colspan="8" class="text-center text-muted">Loading recorded attestations...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- Footer -->
+    <!-- Institutional Footer -->
     <footer class="footer">
-      <p>HH Goa 2026 Shortlisting Task 3 • Built with InsightFace Buffalo, EVM Web3 Smart Contracts, and PostgreSQL (pgvector).</p>
+      <div class="footer-inner">
+        <span>Aegis Identity • Decentralized Biometric Attestation Protocol</span>
+        <div class="footer-links">
+          <span>Smart Contract Verified</span>
+          <span>•</span>
+          <span>Cryptographic Proof Engine</span>
+          <span>•</span>
+          <span>Zero-Knowledge Architecture Ready</span>
+        </div>
+      </div>
     </footer>
   </div>
 

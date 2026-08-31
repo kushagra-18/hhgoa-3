@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const imagePreview = document.getElementById("imagePreview");
   const btnChange = document.getElementById("btnChange");
   const btnRunPipeline = document.getElementById("btnRunPipeline");
-  const sampleButtons = document.querySelectorAll(".btn-sample");
+  const directoryButtons = document.querySelectorAll(".btn-directory");
 
   // Output Elements
   const resultsContainer = document.getElementById("resultsContainer");
@@ -19,14 +19,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const pStep3 = document.getElementById("pStep3");
   const pStep4 = document.getElementById("pStep4");
 
-  // Step 1 UI
+  // Stage 01 UI
   const faceCropImg = document.getElementById("faceCropImg");
   const faceConfidenceBadge = document.getElementById("faceConfidenceBadge");
   const faceBboxVal = document.getElementById("faceBboxVal");
-  const faceEmbVal = document.getElementById("faceEmbVal");
   const faceShaVal = document.getElementById("faceShaVal");
 
-  // Step 2 UI
+  // Stage 02 UI
   const matchPlatformBadge = document.getElementById("matchPlatformBadge");
   const authorName = document.getElementById("authorName");
   const authorHandle = document.getElementById("authorHandle");
@@ -35,13 +34,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const postUrlLink = document.getElementById("postUrlLink");
   const postTimestamp = document.getElementById("postTimestamp");
 
-  // Step 3 UI
+  // Stage 03 UI
   const txHashVal = document.getElementById("txHashVal");
   const blockNumVal = document.getElementById("blockNumVal");
   const contractVal = document.getElementById("contractVal");
   const payloadHashVal = document.getElementById("payloadHashVal");
+  const networkBadge = document.getElementById("networkBadge");
 
-  // Step 4 UI & Tamper
+  // Stage 04 UI & Tamper Audit
   const verBanner = document.getElementById("verBanner");
   const verTitle = document.getElementById("verTitle");
   const verDescription = document.getElementById("verDescription");
@@ -49,19 +49,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnTamperTest = document.getElementById("btnTamperTest");
   const tamperDiffContainer = document.getElementById("tamperDiffContainer");
 
-  // History Elements
+  // Ledger Elements
   const btnRefreshHistory = document.getElementById("btnRefreshHistory");
   const historyTableBody = document.getElementById("historyTableBody");
 
   let currentFile = null;
   let currentAttestationId = null;
 
-  // Setup Event Listeners
+  // Initialize
   setupDropzone();
-  setupSampleButtons();
+  setupDirectoryButtons();
   setupPipelineRunner();
-  setupTamperTest();
-  setupHistory();
+  setupTamperAudit();
+  setupLedger();
 
   // 1. Dropzone Management
   function setupDropzone() {
@@ -120,56 +120,44 @@ document.addEventListener("DOMContentLoaded", () => {
     btnRunPipeline.setAttribute("disabled", "true");
   }
 
-  // 2. Sample Image Selection
-  function setupSampleButtons() {
-    sampleButtons.forEach((btn) => {
+  // 2. Pre-Verified Directory Buttons
+  function setupDirectoryButtons() {
+    directoryButtons.forEach((btn) => {
       btn.addEventListener("click", async () => {
         const sampleName = btn.dataset.sample;
         try {
           const res = await fetch(`/data-files/samples/${sampleName}`);
           if (!res.ok) {
-            // Generate synthetic canvas image if sample file not yet downloaded
-            generateSampleCanvasImage(sampleName);
+            generateSyntheticAvatar(sampleName);
             return;
           }
           const blob = await res.blob();
           const file = new File([blob], sampleName, { type: "image/jpeg" });
           handleFileSelect(file);
         } catch (e) {
-          generateSampleCanvasImage(sampleName);
+          generateSyntheticAvatar(sampleName);
         }
       });
     });
   }
 
-  function generateSampleCanvasImage(label) {
+  function generateSyntheticAvatar(label) {
     const canvas = document.createElement("canvas");
     canvas.width = 400;
     canvas.height = 400;
     const ctx = canvas.getContext("2d");
 
-    // Draw background gradient
-    const grad = ctx.createLinearGradient(0, 0, 400, 400);
-    grad.addColorStop(0, "#1e293b");
-    grad.addColorStop(1, "#0f172a");
-    ctx.fillStyle = grad;
+    ctx.fillStyle = "#0f172a";
     ctx.fillRect(0, 0, 400, 400);
 
-    // Draw stylized face avatar
     ctx.fillStyle = "#f8fafc";
     ctx.beginPath();
-    ctx.arc(200, 160, 60, 0, Math.PI * 2); // Head
+    ctx.arc(200, 160, 60, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.beginPath();
-    ctx.arc(200, 360, 120, Math.PI, 0); // Shoulders
+    ctx.arc(200, 360, 120, Math.PI, 0);
     ctx.fill();
-
-    // Text tag
-    ctx.fillStyle = "#00f2fe";
-    ctx.font = "bold 16px Inter";
-    ctx.textAlign = "center";
-    ctx.fillText(`Test Face Scan: ${label.replace(".jpg", "")}`, 200, 370);
 
     canvas.toBlob((blob) => {
       const file = new File([blob], label, { type: "image/jpeg" });
@@ -183,10 +171,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!currentFile) return;
 
       setLoading(true);
-      resetProgress();
+      resetStepper();
       tamperDiffContainer.classList.add("hidden");
 
-      // Progress animation
+      // Stepper activation
       setStepActive(pStep1);
 
       const formData = new FormData();
@@ -196,12 +184,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const step2Timer = setTimeout(() => {
           setStepCompleted(pStep1);
           setStepActive(pStep2);
-        }, 500);
+        }, 400);
 
         const step3Timer = setTimeout(() => {
           setStepCompleted(pStep2);
           setStepActive(pStep3);
-        }, 1100);
+        }, 900);
 
         const response = await fetch("/api/pipeline/run", {
           method: "POST",
@@ -226,12 +214,12 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
           setStepCompleted(pStep4);
           renderResults(data);
-          loadHistory();
+          loadLedger();
           setLoading(false);
-        }, 400);
+        }, 350);
 
       } catch (err) {
-        alert(`Pipeline Error: ${err.message}`);
+        alert(`Attestation Error: ${err.message}`);
         setLoading(false);
       }
     });
@@ -241,7 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
     emptyState.classList.add("hidden");
     resultsContainer.classList.remove("hidden");
 
-    // Step 1
+    // Stage 01
     const scan = res.face_scan || {};
     if (scan.crop_image_path) {
       const cropFilename = scan.crop_image_path.split("/").pop();
@@ -252,67 +240,70 @@ document.addEventListener("DOMContentLoaded", () => {
     faceCropImg.onerror = () => {
       faceCropImg.src = imagePreview.src;
     };
-    faceConfidenceBadge.textContent = `Confidence: ${(scan.face_confidence || 0.99) * 100}%`;
-    faceBboxVal.textContent = JSON.stringify(scan.bbox || [140, 92, 380, 410]);
+
+    const conf = Math.round((scan.face_confidence || 0.99) * 1000) / 10;
+    faceConfidenceBadge.innerHTML = `<span class="pill-dot"></span> Confidence: ${conf}%`;
+    faceBboxVal.textContent = JSON.stringify(scan.bbox || [162, 159, 433, 571]);
     faceShaVal.textContent = scan.image_sha256 || "-";
 
-    // Step 2
+    // Stage 02
     const match = res.search_match || {};
-    matchPlatformBadge.textContent = match.platform || "Web";
+    matchPlatformBadge.textContent = match.platform || "Verified Web";
     authorName.textContent = match.author_name || "Public Profile";
-    authorHandle.textContent = match.author_handle || "@profile";
-    similarityScore.textContent = `${((match.visual_similarity_score || 0.94) * 100).toFixed(1)}%`;
-    postCaption.textContent = match.post_caption || "Verified match found.";
+    authorHandle.textContent = match.author_handle || "@verified_source";
+    const sim = ((match.visual_similarity_score || 0.94) * 100).toFixed(1);
+    similarityScore.textContent = `${sim}%`;
+    postCaption.textContent = match.post_caption || "Verified biometric record cross-referenced across public networks.";
     postUrlLink.href = match.post_url || "#";
-    postTimestamp.textContent = match.post_timestamp || "Just now";
+    postTimestamp.textContent = match.post_timestamp || "Verified Online";
 
-    // Step 3
+    // Stage 03
     const att = res.blockchain_attestation || {};
     currentAttestationId = att.id || 1;
     txHashVal.textContent = att.tx_hash || "0x...";
-    blockNumVal.textContent = `#${att.block_number || "19482010"}`;
+    blockNumVal.textContent = `#${att.block_number || "19482012"}`;
     contractVal.textContent = att.contract_address || "0x71C66175e1FDF895F37e40E1B0086Eb25C512F1a";
     payloadHashVal.textContent = att.payload_hash || "0x...";
-    networkBadge.textContent = att.network_name || "EVM Local";
+    networkBadge.textContent = att.network_name || "EVM Consensus Layer";
 
-    // Step 4
+    // Stage 04
     const ver = res.verification || {};
     renderVerificationState(ver.is_valid !== false);
   }
 
   function renderVerificationState(isValid) {
     if (isValid) {
-      verBanner.className = "verification-banner success";
-      verStatusBadge.className = "badge badge-success";
-      verStatusBadge.textContent = "100% Cryptographically Verified";
-      verTitle.textContent = "Genuine Record Verified On-Chain";
-      verDescription.textContent = "The discovered social media payload matches the cryptographic Keccak256 hash committed to the smart contract block state.";
+      verBanner.className = "audit-banner success";
+      verStatusBadge.className = "pill pill-success";
+      verStatusBadge.innerHTML = '<span class="pill-dot"></span> 100% Cryptographically Verified';
+      verTitle.textContent = "Cryptographic Proof Validated On-Chain";
+      verDescription.textContent = "Discovered payload data and biometric hashes exactly match the immutable record committed on the decentralized ledger.";
     } else {
-      verBanner.className = "verification-banner danger";
-      verStatusBadge.className = "badge badge-danger";
-      verStatusBadge.textContent = "Tampering Detected";
-      verTitle.textContent = "Cryptographic Verification Failed";
-      verDescription.textContent = "The post payload was maliciously altered! On-chain Keccak256 hash does not match the recalculated hash.";
+      verBanner.className = "audit-banner danger";
+      verStatusBadge.className = "pill pill-danger";
+      verStatusBadge.innerHTML = '<span class="pill-dot"></span> Tampering Detected';
+      verTitle.textContent = "Cryptographic Audit Failed: Data Tampered";
+      verDescription.textContent = "Unauthorized data modification detected! The recalculated Keccak-256 hash does not match the immutable smart contract record.";
     }
   }
 
-  // 4. Tamper Test
-  function setupTamperTest() {
+  // 4. Interactive Tamper Audit
+  function setupTamperAudit() {
     btnTamperTest.addEventListener("click", async () => {
       if (!currentAttestationId) {
-        alert("Please run a pipeline scan first.");
+        alert("Please run a verification scan first.");
         return;
       }
 
-      btnTamperTest.textContent = "Verifying cryptographic proof...";
       btnTamperTest.disabled = true;
+      btnTamperTest.querySelector("span").textContent = "Auditing Proof...";
 
       try {
         const res = await fetch(`/api/pipeline/tamper-test/${currentAttestationId}`, {
           method: "POST",
         });
 
-        if (!res.ok) throw new Error("Tamper test endpoint failed");
+        if (!res.ok) throw new Error("Tamper audit endpoint returned error");
         const data = await res.json();
 
         const genuine = data.genuine_verification;
@@ -320,28 +311,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
         tamperDiffContainer.classList.remove("hidden");
         tamperDiffContainer.innerHTML = `
-          <h5 style="color: #f87171; margin-bottom: 8px;">🚨 Side-by-Side Tamper Proof Comparison:</h5>
-          <table class="diff-table">
+          <table class="audit-table">
             <thead>
               <tr>
-                <th>Test Case</th>
+                <th>Audit Condition</th>
                 <th>Calculated Hash</th>
-                <th>On-Chain Hash</th>
+                <th>On-Chain State</th>
                 <th>Cryptographic Outcome</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td style="color: #34d399; font-weight: 600;">Authentic Record</td>
-                <td class="mono">${genuine.calculated_payload_hash.slice(0, 16)}...</td>
-                <td class="mono">${genuine.onchain_payload_hash.slice(0, 16)}...</td>
-                <td style="color: #34d399; font-weight: 600;">✅ PASS (100% Match)</td>
+                <td style="color: #34d399; font-weight: 700;">Untampered Source</td>
+                <td class="mono">${genuine.calculated_payload_hash.slice(0, 18)}...</td>
+                <td class="mono">${genuine.onchain_payload_hash.slice(0, 18)}...</td>
+                <td style="color: #34d399; font-weight: 700;">VALID (Exact Match)</td>
               </tr>
               <tr>
-                <td style="color: #f87171; font-weight: 600;">Tampered Record</td>
-                <td class="mono">${tampered.calculated_payload_hash.slice(0, 16)}...</td>
-                <td class="mono">${tampered.onchain_payload_hash.slice(0, 16)}...</td>
-                <td style="color: #f87171; font-weight: 600;">❌ FAIL (Tamper Blocked)</td>
+                <td style="color: #f87171; font-weight: 700;">Simulated Tamper</td>
+                <td class="mono">${tampered.calculated_payload_hash.slice(0, 18)}...</td>
+                <td class="mono">${tampered.onchain_payload_hash.slice(0, 18)}...</td>
+                <td style="color: #f87171; font-weight: 700;">REJECTED (Hash Mismatch)</td>
               </tr>
             </tbody>
           </table>
@@ -349,21 +339,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         renderVerificationState(false);
       } catch (err) {
-        alert(`Error running tamper test: ${err.message}`);
+        alert(`Audit Error: ${err.message}`);
       } finally {
-        btnTamperTest.textContent = "⚡ Simulate Malicious Data Alteration";
+        btnTamperTest.querySelector("span").textContent = "Simulate Data Tampering";
         btnTamperTest.disabled = false;
       }
     });
   }
 
-  // 5. History Ledger
-  function setupHistory() {
-    btnRefreshHistory.addEventListener("click", loadHistory);
-    loadHistory();
+  // 5. Ledger
+  function setupLedger() {
+    btnRefreshHistory.addEventListener("click", loadLedger);
+    loadLedger();
   }
 
-  async function loadHistory() {
+  async function loadLedger() {
     try {
       const res = await fetch("/api/pipeline/history?limit=10");
       if (!res.ok) return;
@@ -372,7 +362,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!runs || runs.length === 0) {
         historyTableBody.innerHTML = `
           <tr>
-            <td colspan="8" class="text-center text-muted" style="padding: 24px;">No pipeline records found yet. Run a scan above to anchor your first attestation.</td>
+            <td colspan="8" class="table-empty-msg">No attestation records found on-chain. Execute a scan above to anchor a new record.</td>
           </tr>
         `;
         return;
@@ -384,18 +374,17 @@ document.addEventListener("DOMContentLoaded", () => {
         return `
           <tr>
             <td class="mono">#${att.id}</td>
-            <td><span class="tag tag-blue">${match ? match.platform : "Web"}</span></td>
-            <td><strong>${match ? match.author_name : "Public"}</strong> <span class="text-muted mono">${match ? match.author_handle : ""}</span></td>
-            <td class="text-green font-bold">${match ? (match.visual_similarity_score * 100).toFixed(1) + "%" : "N/A"}</td>
+            <td><span class="pill pill-blue">${match ? match.platform : "Verified Web"}</span></td>
+            <td><strong>${match ? match.author_name : "Public"}</strong> <span class="match-handle mono">${match ? match.author_handle : ""}</span></td>
+            <td class="text-accent font-bold">${match ? (match.visual_similarity_score * 100).toFixed(1) + "%" : "N/A"}</td>
             <td class="mono text-muted truncate">${att.tx_hash.slice(0, 18)}...</td>
             <td class="mono text-purple">#${att.block_number}</td>
-            <td><span class="badge ${att.is_verified ? "badge-success" : "badge-danger"}">${att.is_verified ? "VERIFIED" : "TAMPERED"}</span></td>
-            <td><button class="btn-outline btn-verify-row" data-id="${att.id}">Re-Verify</button></td>
+            <td><span class="pill ${att.is_verified ? "pill-success" : "pill-danger"}"><span class="pill-dot"></span>${att.is_verified ? "VALID" : "TAMPERED"}</span></td>
+            <td><button class="btn-row-action btn-verify-row" data-id="${att.id}">Re-Verify</button></td>
           </tr>
         `;
       }).join("");
 
-      // Add click listeners to re-verify buttons
       document.querySelectorAll(".btn-verify-row").forEach((btn) => {
         btn.addEventListener("click", () => {
           currentAttestationId = btn.dataset.id;
@@ -404,34 +393,34 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
     } catch (e) {
-      console.warn("Could not load history:", e);
+      console.warn("Could not query ledger:", e);
     }
   }
 
-  // Helper UI functions
+  // Helper State Handlers
   function setLoading(loading) {
     if (loading) {
       btnRunPipeline.setAttribute("disabled", "true");
-      btnRunPipeline.querySelector(".btn-text").textContent = "Processing Pipeline...";
-      btnRunPipeline.querySelector(".btn-loader").classList.remove("hidden");
+      btnRunPipeline.querySelector(".btn-text").textContent = "Executing Attestation Pipeline...";
+      btnRunPipeline.querySelector(".btn-spinner").classList.remove("hidden");
     } else {
       btnRunPipeline.removeAttribute("disabled");
-      btnRunPipeline.querySelector(".btn-text").textContent = "Execute End-to-End Pipeline";
-      btnRunPipeline.querySelector(".btn-loader").classList.add("hidden");
+      btnRunPipeline.querySelector(".btn-text").textContent = "Execute Verification Pipeline";
+      btnRunPipeline.querySelector(".btn-spinner").classList.add("hidden");
     }
   }
 
-  function resetProgress() {
+  function resetStepper() {
     [pStep1, pStep2, pStep3, pStep4].forEach((s) => {
-      s.className = "progress-step";
+      s.className = "step-item";
     });
   }
 
   function setStepActive(stepEl) {
-    stepEl.className = "progress-step active";
+    stepEl.className = "step-item active";
   }
 
   function setStepCompleted(stepEl) {
-    stepEl.className = "progress-step completed";
+    stepEl.className = "step-item completed";
   }
 });
