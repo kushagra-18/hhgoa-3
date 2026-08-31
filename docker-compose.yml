@@ -1,0 +1,50 @@
+services:
+  # PostgreSQL 16 with pgvector extension for 512-dim face embeddings
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: hhgoa_pgvector
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: face_verification_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d face_verification_db"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+  # Main Face-to-Blockchain Pipeline & Web UI
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hhgoa_pipeline_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8090}:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgrespassword@db:5432/face_verification_db
+      - INSIGHTFACE_MODEL_NAME=buffalo_l
+      - INSIGHTFACE_DET_SIZE=640
+      - APP_ENV=production
+      - DEBUG=False
+      - HOST=0.0.0.0
+      - PORT=8000
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+      - ./contracts:/app/contracts
+      - ./data:/app/data
+      - ./models:/root/.insightface/models
+
+volumes:
+  pgdata:
+    driver: local

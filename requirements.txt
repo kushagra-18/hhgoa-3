@@ -1,0 +1,37 @@
+# Core Computer Vision & Face Detection
+insightface>=0.7.3
+onnxruntime>=1.18.0
+opencv-python-headless>=4.9.0
+numpy>=1.24.0,<2.0.0
+pillow>=10.0.0
+
+# Database & Vector Store
+sqlalchemy>=2.0.25
+psycopg2-binary>=2.9.9
+pgvector>=0.2.5
+
+# Blockchain & Cryptography
+web3>=6.15.0
+eth-account>=0.11.0
+pycryptodome>=3.20.0
+
+# Web Framework & API
+fastapi>=0.110.0
+uvicorn>=0.28.0
+pydantic>=2.6.0
+pydantic-settings>=2.2.0
+python-multipart>=0.0.9
+
+# Search & Scraping
+requests>=2.31.0
+beautifulsoup4>=4.12.3
+httpx>=0.27.0
+
+# CLI & Utilities
+rich>=13.7.1
+click>=8.1.7
+python-dotenv>=1.0.1
+
+# Testing
+pytest>=8.0.0
+pytest-asyncio>=0.23.5

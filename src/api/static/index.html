@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HH Goa 2026: Face-to-Blockchain Verification Pipeline</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo-group">
+        <div class="logo-icon">🔐</div>
+        <div>
+          <h1>HH Goa 2026 <span class="badge-sub">Task 3</span></h1>
+          <p class="subtitle">Face Identification & Blockchain Verification Pipeline</p>
+        </div>
+      </div>
+      <div class="header-tags">
+        <span class="tag tag-blue"><span class="dot dot-blue"></span>InsightFace Buffalo (512-d)</span>
+        <span class="tag tag-purple"><span class="dot dot-purple"></span>EVM Smart Contract</span>
+        <span class="tag tag-green"><span class="dot dot-green"></span>PostgreSQL + pgvector</span>
+      </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="main-grid">
+      <!-- Left Column: Input & Controls -->
+      <section class="card input-card">
+        <div class="card-header">
+          <h2>1. Input Face Scan</h2>
+          <span class="step-num">Step 1</span>
+        </div>
+
+        <!-- Upload Dropzone -->
+        <div class="dropzone" id="dropzone">
+          <input type="file" id="fileInput" accept="image/*" class="file-input">
+          <div class="dropzone-content" id="dropzoneContent">
+            <div class="upload-icon">📷</div>
+            <h3>Drag & Drop Face Image</h3>
+            <p>or click to browse from device</p>
+            <span class="formats">Supports JPG, PNG, WEBP</span>
+          </div>
+          <div class="preview-container hidden" id="previewContainer">
+            <img id="imagePreview" src="" alt="Scan Preview">
+            <button type="button" class="btn-change" id="btnChange">Change</button>
+          </div>
+        </div>
+
+        <!-- Quick Sample Images -->
+        <div class="sample-section">
+          <label>Or select a demo test scan:</label>
+          <div class="sample-buttons">
+            <button class="btn-sample" data-sample="sample_sataboris.jpg">👤 Satoshi B. (Tech)</button>
+            <button class="btn-sample" data-sample="sample_elena.jpg">👩‍🔬 Dr. Elena (AI)</button>
+            <button class="btn-sample" data-sample="sample_alex.jpg">👨‍💻 Alex V. (Web3)</button>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <button id="btnRunPipeline" class="btn-primary" disabled>
+          <span class="btn-text">Execute End-to-End Pipeline</span>
+          <span class="btn-loader hidden"></span>
+        </button>
+
+        <!-- Pipeline Execution Steps Progress Indicator -->
+        <div class="pipeline-progress" id="pipelineProgress">
+          <div class="progress-step" id="pStep1">
+            <div class="step-icon">1</div>
+            <div class="step-label">Face Encoding (InsightFace)</div>
+          </div>
+          <div class="progress-line"></div>
+          <div class="progress-step" id="pStep2">
+            <div class="step-icon">2</div>
+            <div class="step-label">Web / Social Search</div>
+          </div>
+          <div class="progress-line"></div>
+          <div class="progress-step" id="pStep3">
+            <div class="step-icon">3</div>
+            <div class="step-label">Blockchain Anchor</div>
+          </div>
+          <div class="progress-line"></div>
+          <div class="progress-step" id="pStep4">
+            <div class="step-icon">4</div>
+            <div class="step-label">On-Chain Verification</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Pipeline Output Panels -->
+      <section class="output-column">
+        <!-- Results Container -->
+        <div id="resultsContainer" class="results-container hidden">
+          <!-- Step 1: Face Features Card -->
+          <div class="card result-card">
+            <div class="card-header">
+              <h3><span class="card-num">1</span> InsightFace Buffalo Identification</h3>
+              <span class="badge badge-success" id="faceConfidenceBadge">Confidence: 99.4%</span>
+            </div>
+            <div class="face-features-grid">
+              <div class="crop-viewer">
+                <img id="faceCropImg" src="" alt="Cropped Aligned Face">
+                <span class="crop-label">Aligned Face Crop</span>
+              </div>
+              <div class="meta-list">
+                <div class="meta-row">
+                  <span class="meta-key">Bounding Box:</span>
+                  <span class="meta-val mono" id="faceBboxVal">[140, 92, 380, 410]</span>
+                </div>
+                <div class="meta-row">
+                  <span class="meta-key">Embedding Vector:</span>
+                  <span class="meta-val mono" id="faceEmbVal">512-dim Normalized L2</span>
+                </div>
+                <div class="meta-row">
+                  <span class="meta-key">Image SHA-256:</span>
+                  <span class="meta-val mono truncate" id="faceShaVal">-</span>
+                </div>
+                <div class="meta-row">
+                  <span class="meta-key">Vector Store:</span>
+                  <span class="meta-val text-green">Indexed in PostgreSQL (pgvector)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Discovered Social Media Post Card -->
+          <div class="card result-card">
+            <div class="card-header">
+              <h3><span class="card-num">2</span> Discovered Social Media / Web Match</h3>
+              <span class="badge badge-blue" id="matchPlatformBadge">Twitter/X</span>
+            </div>
+            <div class="social-post-card">
+              <div class="social-post-header">
+                <div class="author-avatar" id="authorAvatar">👤</div>
+                <div class="author-info">
+                  <h4 id="authorName">Satoshi Borisov</h4>
+                  <span class="author-handle mono" id="authorHandle">@sataboris</span>
+                </div>
+                <div class="similarity-pill">
+                  <span class="sim-label">Face Similarity</span>
+                  <span class="sim-val" id="similarityScore">94.8%</span>
+                </div>
+              </div>
+              <div class="social-post-body">
+                <p id="postCaption" class="post-text">Excited to share our research on zero-knowledge identity proofs and on-chain face attestation at #Web3Summit!</p>
+              </div>
+              <div class="social-post-footer">
+                <a href="#" target="_blank" id="postUrlLink" class="post-link">View Original Post ↗</a>
+                <span class="post-time mono" id="postTimestamp">2024-05-11 16:42 UTC</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: Blockchain Attestation Card -->
+          <div class="card result-card">
+            <div class="card-header">
+              <h3><span class="card-num">3</span> Blockchain Smart Contract Attestation</h3>
+              <span class="badge badge-purple" id="networkBadge">EVM Anchor</span>
+            </div>
+            <div class="blockchain-meta-grid">
+              <div class="chain-stat">
+                <span class="stat-label">Transaction Hash</span>
+                <span class="stat-value mono truncate" id="txHashVal">0x...</span>
+              </div>
+              <div class="chain-stat">
+                <span class="stat-label">Block Number</span>
+                <span class="stat-value mono text-purple" id="blockNumVal">#19482011</span>
+              </div>
+              <div class="chain-stat">
+                <span class="stat-label">Contract Address</span>
+                <span class="stat-value mono truncate" id="contractVal">0x71C...2F1a</span>
+              </div>
+              <div class="chain-stat">
+                <span class="stat-label">Payload Keccak256</span>
+                <span class="stat-value mono truncate" id="payloadHashVal">0x...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4: Cryptographic Verification & Tamper Simulation -->
+          <div class="card result-card verification-card" id="verificationCard">
+            <div class="card-header">
+              <h3><span class="card-num">4</span> On-Chain Tamper-Evident Verification Proof</h3>
+              <span class="badge badge-success" id="verStatusBadge">100% Cryptographically Verified</span>
+            </div>
+            <div class="verification-body">
+              <div class="verification-banner success" id="verBanner">
+                <div class="ver-icon" id="verIcon">🛡️</div>
+                <div class="ver-text">
+                  <h4 id="verTitle">Genuine Record Verified On-Chain</h4>
+                  <p id="verDescription">The discovered social media payload matches the cryptographic Keccak256 hash committed to the smart contract block state.</p>
+                </div>
+              </div>
+
+              <!-- Interactive Live Tamper Demo Controls -->
+              <div class="tamper-control-box">
+                <div class="tamper-header">
+                  <div>
+                    <h4>Interactive Tamper Evidence Demonstration</h4>
+                    <p class="text-muted">Test how blockchain cryptography detects malicious modifications instantly.</p>
+                  </div>
+                  <button id="btnTamperTest" class="btn-tamper">
+                    ⚡ Simulate Malicious Data Alteration
+                  </button>
+                </div>
+                <!-- Tamper Diff Results (Shown when clicked) -->
+                <div id="tamperDiffContainer" class="tamper-diff hidden"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Initial Placeholder State -->
+        <div id="emptyState" class="card empty-state">
+          <div class="empty-icon">⚡</div>
+          <h3>Ready to Execute Pipeline</h3>
+          <p>Upload a face scan or select a sample image on the left to begin face identification, reverse social media search, and on-chain blockchain anchoring.</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Historical Ledger Section -->
+    <section class="card history-section">
+      <div class="card-header">
+        <h2>📜 Immutable Attestation Ledger & History</h2>
+        <button id="btnRefreshHistory" class="btn-outline">↻ Refresh History</button>
+      </div>
+      <div class="table-responsive">
+        <table class="ledger-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Platform</th>
+              <th>Author</th>
+              <th>Similarity</th>
+              <th>Tx Hash</th>
+              <th>Block</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <tr>
+              <td colspan="8" class="text-center text-muted">Loading recorded attestations...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>HH Goa 2026 Shortlisting Task 3 • Built with InsightFace Buffalo, EVM Web3 Smart Contracts, and PostgreSQL (pgvector).</p>
+    </footer>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
