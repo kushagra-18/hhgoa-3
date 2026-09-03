@@ -100,18 +100,48 @@ class SearchEngine:
                 "message": "Searching public web for visual matches...",
             })
 
-        # 1. Query reverse image search providers (e.g. SerpApi Google Lens)
+        # 1. Query reverse image search providers in parallel (e.g. SerpApi Google Lens, Yandex, Google Vision)
         discovered_candidates: List[DiscoveredPost] = []
-        for provider in self.providers:
-            if getattr(provider, "name", "") == "RealisticFixtureProvider":
-                continue  # Skip blind modulo fixtures when scanning real faces
-            try:
-                results = provider.search(search_target_path)
-                if results:
-                    discovered_candidates.extend(results)
-                    break
-            except Exception as e:
-                logger.warning(f"Search provider {provider.__class__.__name__} failed: {e}")
+        seen_keys = set()
+
+        real_providers = [
+            p for p in self.providers
+            if getattr(p, "name", "") != "RealisticFixtureProvider"
+        ]
+
+        if real_providers:
+            from concurrent.futures import ThreadPoolExecutor, as_completed
+
+            def _query_provider(p):
+                try:
+                    return p.search(search_target_path)
+                except Exception as ex:
+                    logger.warning(f"Search provider {p.__class__.__name__} failed: {ex}")
+                    return []
+
+            max_w = min(len(real_providers), 4)
+            with ThreadPoolExecutor(max_workers=max_w) as executor:
+                futures = {executor.submit(_query_provider, prov): prov for prov in real_providers}
+                for f in as_completed(futures):
+                    res = f.result()
+                    if res:
+                        for post in res:
+                            key = post.post_url.strip().lower() or post.post_image_url.strip()
+                            if key:
+                                if key not in seen_keys:
+                                    seen_keys.add(key)
+                                    discovered_candidates.append(post)
+                            else:
+                                discovered_candidates.append(post)
+
+        # Fallback to fixture if no candidates were found and fixture provider exists
+        if not discovered_candidates:
+            for p in self.providers:
+                if getattr(p, "name", "") == "RealisticFixtureProvider":
+                    try:
+                        discovered_candidates.extend(p.search(search_target_path))
+                    except Exception as e:
+                        logger.warning(f"Fixture provider failed: {e}")
 
         # 2. Batch score discovered candidates to find the closest face match
         if discovered_candidates and query_face_result and query_face_result.embedding is not None:

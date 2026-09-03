@@ -3,7 +3,8 @@ from typing import Dict, Type, List, Optional
 
 from src.config import settings
 from src.search.providers.base import BaseSearchProvider
-from src.search.providers.serpapi import SerpApiLensProvider
+from src.search.providers.serpapi import SerpApiLensProvider, SerpApiYandexProvider
+from src.search.providers.google_vision import GoogleCloudVisionProvider
 from src.search.providers.serper import SerperVisualProvider
 from src.search.providers.firecrawl import FirecrawlSearchProvider
 from src.search.providers.open_web import LiveOpenWebSearchProvider
@@ -20,6 +21,8 @@ class SearchProviderFactory:
 
     _registry: Dict[str, Type[BaseSearchProvider]] = {
         "serpapi": SerpApiLensProvider,
+        "yandex": SerpApiYandexProvider,
+        "google_vision": GoogleCloudVisionProvider,
         "serper": SerperVisualProvider,
         "firecrawl": FirecrawlSearchProvider,
         "open_web": LiveOpenWebSearchProvider,
@@ -50,22 +53,27 @@ class SearchProviderFactory:
         """
         active_providers: List[BaseSearchProvider] = []
 
-        # 1. SerpApi Google Lens (if API key configured)
+        # 1. SerpApi Google Lens & Yandex Visual Search (if SerpApi key configured)
         if settings.SERPAPI_API_KEY:
             active_providers.append(cls.create("serpapi"))
+            active_providers.append(cls.create("yandex"))
 
-        # 2. Firecrawl AI Web Crawler (if API key configured)
+        # 2. Google Cloud Vision Web Detection (if Google Vision API key configured)
+        if getattr(settings, "GOOGLE_VISION_API_KEY", ""):
+            active_providers.append(cls.create("google_vision"))
+
+        # 3. Firecrawl AI Web Crawler (if API key configured)
         if settings.FIRECRAWL_API_KEY:
             active_providers.append(cls.create("firecrawl"))
 
-        # 3. Serper Visual Search (if API key configured)
+        # 4. Serper Visual Search (if API key configured)
         if settings.SERPER_API_KEY:
             active_providers.append(cls.create("serper"))
 
-        # 4. Live Open Web & Knowledge Graph Provider (Always Active)
+        # 5. Live Open Web & Knowledge Graph Provider (Always Active)
         active_providers.append(cls.create("open_web"))
 
-        # 5. Verified Offline Fixture (Fallback)
+        # 6. Verified Offline Fixture (Fallback)
         active_providers.append(cls.create("fixture"))
 
         return active_providers

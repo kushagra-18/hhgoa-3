@@ -2,7 +2,8 @@
 Search providers module with Factory pattern implementation.
 """
 from src.search.providers.base import BaseSearchProvider
-from src.search.providers.serpapi import SerpApiLensProvider
+from src.search.providers.serpapi import SerpApiLensProvider, SerpApiYandexProvider
+from src.search.providers.google_vision import GoogleCloudVisionProvider
 from src.search.providers.serper import SerperVisualProvider
 from src.search.providers.firecrawl import FirecrawlSearchProvider
 from src.search.providers.open_web import LiveOpenWebSearchProvider
@@ -13,6 +14,8 @@ __all__ = [
     "BaseSearchProvider",
     "SearchProviderFactory",
     "SerpApiLensProvider",
+    "SerpApiYandexProvider",
+    "GoogleCloudVisionProvider",
     "SerperVisualProvider",
     "FirecrawlSearchProvider",
     "LiveOpenWebSearchProvider",

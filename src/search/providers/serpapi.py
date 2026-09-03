@@ -130,3 +130,144 @@ class SerpApiLensProvider(BaseSearchProvider):
         except Exception as e:
             logger.error(f"SerpApi Google Lens search error: {e}")
             return []
+
+
+class SerpApiYandexProvider(BaseSearchProvider):
+    """Yandex Reverse Image Search via SerpApi (engine=yandex_images)."""
+
+    def __init__(self, api_key: Optional[str] = None):
+        self.api_key = api_key or settings.SERPAPI_API_KEY
+
+    def _get_public_image_url(self, image_path: str, image_bytes: Optional[bytes] = None) -> Optional[str]:
+        """Upload image to a fast anonymous host to get a public URL for Yandex."""
+        if image_path.startswith("http://") or image_path.startswith("https://"):
+            return image_path
+
+        if not image_bytes:
+            try:
+                with open(image_path, "rb") as f:
+                    image_bytes = f.read()
+            except Exception as e:
+                logger.warning(f"Could not read image file for Yandex upload: {e}")
+                return None
+
+        # Attempt 1: freeimage.host (Generates direct iili.io public image CDN link that Yandex reliably accesses)
+        try:
+            r = requests.post(
+                "https://freeimage.host/api/1/upload",
+                data={"key": "6d207e02198a847aa98d0a2a901485a5", "action": "upload"},
+                files={"source": ("face_scan.jpg", image_bytes, "image/jpeg")},
+                timeout=12,
+            )
+            if r.status_code == 200:
+                direct_url = r.json().get("image", {}).get("url", "")
+                if direct_url and direct_url.startswith("http"):
+                    return direct_url.strip()
+        except Exception as e:
+            logger.debug(f"FreeImage upload failed: {e}")
+
+        # Attempt 2: catbox.moe (Direct files.catbox.moe CDN link with browser UA)
+        try:
+            headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
+            r = requests.post(
+                "https://catbox.moe/user/api.php",
+                headers=headers,
+                data={"reqtype": "fileupload"},
+                files={"fileToUpload": ("face_scan.jpg", image_bytes, "image/jpeg")},
+                timeout=12,
+            )
+            if r.status_code == 200 and r.text.startswith("http"):
+                return r.text.strip()
+        except Exception as e:
+            logger.debug(f"Catbox upload failed: {e}")
+
+        return None
+
+    def search(
+        self,
+        image_path: str,
+        image_bytes: Optional[bytes] = None,
+        top_n: int = 15,
+    ) -> List[DiscoveredPost]:
+        if not self.api_key:
+            logger.info("SerpApi API key not configured, skipping Yandex search.")
+            return []
+
+        try:
+            logger.info("Executing Yandex Reverse Image search via SerpApi...")
+            public_url = self._get_public_image_url(image_path, image_bytes)
+            if not public_url:
+                logger.warning("Could not establish public image URL for Yandex search.")
+                return []
+
+            search_url = "https://serpapi.com/search"
+            search_params = {
+                "engine": "yandex_images",
+                "url": public_url,
+                "api_key": self.api_key,
+            }
+            search_res = requests.get(search_url, params=search_params, timeout=30)
+            if search_res.status_code != 200:
+                logger.warning(f"SerpApi Yandex search failed ({search_res.status_code}): {search_res.text}")
+                return []
+
+            data = search_res.json()
+            if getattr(settings, "APP_ENV", "").lower() in ("dev", "development"):
+                import json
+                try:
+                    debug_file = settings.DATA_DIR / "serpapi_yandex_response_latest.json"
+                    with open(debug_file, "w", encoding="utf-8") as df:
+                        json.dump(data, df, indent=2)
+                except Exception:
+                    pass
+
+            image_results = data.get("image_results", [])
+            similar_images = data.get("similar_images", [])
+            logger.info(
+                f"SerpApi Yandex found {len(image_results)} image results and {len(similar_images)} similar images."
+            )
+
+            matches: List[DiscoveredPost] = []
+            for item in image_results[:top_n]:
+                link = item.get("link", "")
+                title = item.get("title", "")
+                source = item.get("source", "")
+                snippet = item.get("snippet", "") or title
+
+                thumb_obj = item.get("thumbnail")
+                thumb_url = thumb_obj.get("link", "") if isinstance(thumb_obj, dict) else (thumb_obj or "")
+                orig_url = item.get("original_image", "") or thumb_url
+                img_url = thumb_url or orig_url
+
+                if link or img_url:
+                    post = SocialPostParser.extract_from_raw(
+                        url=link,
+                        title=title,
+                        snippet=snippet,
+                        image_url=img_url,
+                        author=source or title,
+                        raw_meta={"source_engine": "yandex_images", **item},
+                    )
+                    matches.append(post)
+
+            # Also incorporate similar images if matches list is small
+            if len(matches) < top_n and similar_images:
+                for sim in similar_images[: top_n - len(matches)]:
+                    sim_link = sim.get("link", "")
+                    sim_img = sim.get("image", "")
+                    if sim_link or sim_img:
+                        post = SocialPostParser.extract_from_raw(
+                            url=sim_link,
+                            title="Visually Similar Image",
+                            snippet="Similar face found on Yandex",
+                            image_url=sim_img,
+                            author="Yandex Match",
+                            raw_meta={"source_engine": "yandex_images_similar", **sim},
+                        )
+                        matches.append(post)
+
+            return matches
+
+        except Exception as e:
+            logger.error(f"SerpApi Yandex search error: {e}")
+            return []

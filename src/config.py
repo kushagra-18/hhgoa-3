@@ -38,6 +38,7 @@ class Settings(BaseSettings):
     SERPER_API_KEY: str = ""
     TAVILY_API_KEY: str = ""
     FIRECRAWL_API_KEY: str = ""
+    GOOGLE_VISION_API_KEY: str = ""
 
     # Face Match Similarity Threshold (default: 0.70 / 70%)
     SIMILARITY_THRESHOLD: float = 0.70
