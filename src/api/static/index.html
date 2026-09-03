@@ -3,413 +3,577 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aegis Identity • Enterprise Biometric Provenance & Blockchain Attestation</title>
+  <title>Face Verification & Blockchain Attestation</title>
+  
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Three.js 3D Engine -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  
+  <link rel="stylesheet" href="/static/style.css?v=20260904_11">
+  <style>
+    /* View Tabs Styling */
+    .tabs-nav-wrap {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      margin: 0 auto 24px;
+    }
+    .view-tabs {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 6px !important;
+      background: rgba(15, 23, 42, 0.85) !important;
+      padding: 6px !important;
+      border-radius: 40px !important;
+      border: 1px solid rgba(56, 189, 248, 0.25) !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+    }
+    .view-tab-btn {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      padding: 10px 22px !important;
+      background: transparent !important;
+      border: none !important;
+      outline: none !important;
+      border-radius: 30px !important;
+      color: #94a3b8 !important;
+      font-family: 'Plus Jakarta Sans', sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      transition: all 0.25s ease !important;
+      user-select: none !important;
+    }
+    .view-tab-btn:hover {
+      color: #f8fafc !important;
+      background: rgba(255, 255, 255, 0.08) !important;
+    }
+    .view-tab-btn.active {
+      color: #ffffff !important;
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.35) 0%, rgba(99, 102, 241, 0.4) 100%) !important;
+      border: 1px solid rgba(56, 189, 248, 0.5) !important;
+      box-shadow: 0 0 16px rgba(14, 165, 233, 0.3) !important;
+    }
+    .view-tab-btn.active svg {
+      color: #38bdf8 !important;
+    }
+    .tab-badge {
+      background: rgba(255, 255, 255, 0.15) !important;
+      color: #e2e8f0 !important;
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      padding: 2px 8px !important;
+      border-radius: 12px !important;
+      margin-left: 2px !important;
+    }
+    .view-tab-btn.active .tab-badge {
+      background: rgba(14, 165, 233, 0.5) !important;
+      color: #ffffff !important;
+    /* Natural Aspect-Ratio Image Container */
+    .holo-dropzone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      transition: all 0.3s ease;
+    }
+    .holo-dropzone.has-preview {
+      padding: 0;
+      border-style: solid;
+      border-color: rgba(56, 189, 248, 0.5);
+      background: #020617;
+    }
+    .holo-preview-wrapper {
+      position: relative;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #030712;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .holo-preview-img {
+      width: 100%;
+      height: auto;
+      max-height: 520px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+    }
+    .hidden {
+      display: none !important;
+    }
+  </style>
 </head>
-<body>
-  <div class="page-wrapper">
-    <!-- Institutional Navbar -->
-    <nav class="navbar">
-      <div class="nav-container">
-        <div class="brand">
-          <div class="brand-symbol">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-              <path d="M9 12l2 2 4-4"/>
-            </svg>
+<body class="dark-cyber-theme">
+  <!-- Interactive 3D WebGL Canvas Layer -->
+  <canvas id="webglCanvas" class="webgl-canvas"></canvas>
+  <div class="ambient-vignette"></div>
+
+  <div class="app-layout">
+    <!-- Frosted Glass Header -->
+    <header class="glass-navbar">
+      <div class="nav-content">
+        <div class="brand-group">
+          <div class="brand-3d-cube" id="navBrandCube">
+            <div class="cube-inner">
+              <div class="cube-face cube-front"></div>
+              <div class="cube-face cube-back"></div>
+              <div class="cube-face cube-right"></div>
+              <div class="cube-face cube-left"></div>
+              <div class="cube-face cube-top"></div>
+              <div class="cube-face cube-bottom"></div>
+            </div>
           </div>
-          <div class="brand-text">
-            <span class="brand-name">AEGIS<span class="brand-accent">IDENTITY</span></span>
-            <span class="brand-tier">ENTERPRISE ATTESTATION</span>
+          <div class="brand-meta">
+            <div class="brand-title">Face Verification<span class="glow-accent">Pipeline</span></div>
+            <div class="brand-subtitle">Biometric Identity & Blockchain Attestation</div>
           </div>
         </div>
 
-        <div class="nav-status">
-          <div class="status-indicator">
-            <span class="pulse-dot"></span>
-            <span class="status-text">Network Active</span>
+        <div class="nav-telemetry">
+          <div class="telemetry-node">
+            <span class="node-label">Status: <strong class="text-glow-green">Ready</strong></span>
           </div>
-          <div class="nav-divider"></div>
-          <div class="network-badge">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="2" y="2" width="20" height="8" rx="2"/>
-              <rect x="2" y="14" width="20" height="8" rx="2"/>
-              <line x1="6" y1="6" x2="6.01" y2="6"/>
-              <line x1="6" y1="18" x2="6.01" y2="18"/>
+          <div class="telemetry-divider"></div>
+          <div class="chain-badge-3d">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="margin-right: 4px;">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
             </svg>
-            <span>EVM Consensus Layer</span>
+            <span>EVM Blockchain</span>
           </div>
         </div>
       </div>
-    </nav>
+    </header>
 
-    <!-- Main Container -->
-    <main class="main-container">
-      <!-- Top Overview Header -->
-      <section class="hero-banner">
-        <div class="hero-badge">Immutable Identity Provenance</div>
-        <h1>Facial Verification & Blockchain Attestation</h1>
-        <p class="hero-desc">
-          Cryptographically anchor facial biometric signatures, discover matching public web media, and maintain tamper-evident records on the decentralized ledger.
+    <!-- Main Workspace -->
+    <main class="workspace-container">
+      <!-- Hero Section -->
+      <section class="hero-3d">
+        <h1 class="hero-heading">
+          Face Verification
+          <span class="heading-gradient">& Tamper Detection</span>
+        </h1>
+        <p class="hero-description">
+          Upload a face photo to detect matching online profiles, anchor an attestation to the blockchain, and verify record integrity.
         </p>
       </section>
 
-      <!-- Primary Terminal Grid -->
-      <div class="terminal-grid">
-        <!-- Left Panel: Input & Scan Terminal -->
-        <div class="panel input-panel">
-          <div class="panel-header">
-            <div class="panel-title-group">
-              <span class="panel-icon">01</span>
+      <!-- Navigation Tabs -->
+      <div class="tabs-nav-wrap">
+        <nav class="view-tabs" role="tablist">
+          <button type="button" class="view-tab-btn active" id="tabBtnPipeline" data-tab="pipeline">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            <span>Verification Pipeline</span>
+          </button>
+          <button type="button" class="view-tab-btn" id="tabBtnHistory" data-tab="history">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+            <span>Verification History</span>
+            <span class="tab-badge" id="historyTabBadge">0</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Tab Panel 1: Verification Pipeline -->
+      <div id="tabContentPipeline" class="tab-content-panel active">
+        <!-- Interactive Layout -->
+        <div class="terminal-stage">
+        <!-- Left Panel: Photo Input -->
+        <div class="card-3d input-card-3d">
+          <div class="card-glow-layer"></div>
+          <div class="card-3d-header">
+            <div class="stage-indicator">
+              <span class="stage-num">1</span>
               <div>
-                <h3>Biometric Input Terminal</h3>
-                <p>Upload or select a subject image</p>
+                <h3>Input Photo</h3>
+                <span class="stage-desc">Upload or select an image to scan</span>
               </div>
             </div>
+            <div class="status-chip">READY</div>
           </div>
 
           <!-- Dropzone -->
-          <div class="dropzone" id="dropzone">
-            <input type="file" id="fileInput" accept="image/*" class="file-input">
-            <div class="dropzone-body" id="dropzoneContent">
-              <div class="drop-icon">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <div class="holo-dropzone" id="dropzone">
+            <input type="file" id="fileInput" accept="image/*" class="file-input-hidden">
+            
+            <div class="holo-dropzone-content" id="dropzoneContent">
+              <div class="holo-scan-target">
+                <div class="corner-bracket top-left"></div>
+                <div class="corner-bracket top-right"></div>
+                <div class="corner-bracket bottom-left"></div>
+                <div class="corner-bracket bottom-right"></div>
+                <div class="radar-sweep"></div>
+                
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                   <polyline points="17 8 12 3 7 8"/>
                   <line x1="12" y1="3" x2="12" y2="15"/>
                 </svg>
               </div>
-              <h4>Select or Drag Subject Image</h4>
-              <p>Supports PNG, JPG, WEBP • Max 20MB</p>
+              <h4>Upload a photo to scan</h4>
+              <p>Drag and drop, or click to browse (JPG, PNG, WEBP)</p>
             </div>
-            <div class="preview-container hidden" id="previewContainer">
-              <img id="imagePreview" src="" alt="Subject Preview">
-              <button type="button" class="btn-change-image" id="btnChange">Replace Image</button>
+
+            <!-- Subject Preview with Scanning Overlay -->
+            <div class="holo-preview-wrapper hidden" id="previewContainer">
+              <img id="imagePreview" alt="" class="holo-preview-img">
+              <div class="laser-scanner" id="laserScanner"></div>
+              <div class="face-target-box" id="faceTargetBox"></div>
+              <button type="button" class="btn-holo-change" id="btnChange">Change Photo</button>
             </div>
           </div>
 
-          <!-- Preloaded Profiles -->
-          <div class="sample-directory">
-            <span class="directory-label">Pre-Verified Subject Directory</span>
-            <div class="directory-grid">
-              <button class="btn-directory" data-sample="sample_sataboris.jpg">
-                <span class="dir-avatar">SB</span>
-                <div class="dir-info">
-                  <span class="dir-name">Subject Alpha</span>
-                  <span class="dir-role">Executive Identity</span>
-                </div>
-              </button>
-              <button class="btn-directory" data-sample="sample_elena.jpg">
-                <span class="dir-avatar">ER</span>
-                <div class="dir-info">
-                  <span class="dir-name">Subject Beta</span>
-                  <span class="dir-role">Research Director</span>
-                </div>
-              </button>
-              <button class="btn-directory" data-sample="sample_alex.jpg">
-                <span class="dir-avatar">AV</span>
-                <div class="dir-info">
-                  <span class="dir-name">Subject Gamma</span>
-                  <span class="dir-role">Technical Contributor</span>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          <!-- Primary Execution CTA -->
-          <button id="btnRunPipeline" class="btn-cta" disabled>
-            <span class="btn-text">Execute Verification Pipeline</span>
-            <span class="btn-spinner hidden"></span>
+          <!-- Primary CTA Button with Built-In Progress Line -->
+          <button id="btnRunPipeline" class="btn-3d-cta" disabled>
+            <span class="btn-glare"></span>
+            <span class="btn-content">
+              <span class="btn-spinner-3d hidden" id="btnSpinner"></span>
+              <span class="btn-text" id="btnText">Run Verification</span>
+              <span class="btn-pct-badge hidden" id="btnPctBadge">0%</span>
+            </span>
+            <div class="btn-progress-line" id="btnProgressLine"></div>
           </button>
 
-          <!-- Pipeline Processing Stepper -->
-          <div class="pipeline-stepper" id="pipelineProgress">
-            <div class="step-item" id="pStep1">
-              <div class="step-marker">
-                <span class="step-num">1</span>
-              </div>
-              <div class="step-meta">
-                <span class="step-heading">Biometric Extraction</span>
-                <span class="step-sub">Detect facial geometry & encode signature</span>
+          <!-- Pipeline Progression Stepper -->
+          <div class="stepper-3d" id="pipelineProgress">
+            <div class="step-3d-row" id="pStep1">
+              <div class="step-orb" id="pStep1Orb">1</div>
+              <div class="step-details">
+                <strong>Face Detection</strong>
+                <span id="pStep1Desc">Detect face and extract features</span>
               </div>
             </div>
-
-            <div class="step-connector"></div>
-
-            <div class="step-item" id="pStep2">
-              <div class="step-marker">
-                <span class="step-num">2</span>
-              </div>
-              <div class="step-meta">
-                <span class="step-heading">Web & Social Discovery</span>
-                <span class="step-sub">Cross-reference public online media</span>
+            <div class="step-3d-connector" id="pConn1"></div>
+            <div class="step-3d-row" id="pStep2">
+              <div class="step-orb" id="pStep2Orb">2</div>
+              <div class="step-details">
+                <strong>Web Match</strong>
+                <span id="pStep2Desc">Search public profiles and posts</span>
               </div>
             </div>
-
-            <div class="step-connector"></div>
-
-            <div class="step-item" id="pStep3">
-              <div class="step-marker">
-                <span class="step-num">3</span>
-              </div>
-              <div class="step-meta">
-                <span class="step-heading">Blockchain Attestation</span>
-                <span class="step-sub">Anchor cryptographic hash on-chain</span>
+            <div class="step-3d-connector" id="pConn2"></div>
+            <div class="step-3d-row" id="pStep3">
+              <div class="step-orb" id="pStep3Orb">3</div>
+              <div class="step-details">
+                <strong>Blockchain Record</strong>
+                <span id="pStep3Desc">Anchor attestation on-chain</span>
               </div>
             </div>
-
-            <div class="step-connector"></div>
-
-            <div class="step-item" id="pStep4">
-              <div class="step-marker">
-                <span class="step-num">4</span>
-              </div>
-              <div class="step-meta">
-                <span class="step-heading">On-Chain Audit</span>
-                <span class="step-sub">Verify tamper-evidence against ledger</span>
+            <div class="step-3d-connector" id="pConn3"></div>
+            <div class="step-3d-row" id="pStep4">
+              <div class="step-orb" id="pStep4Orb">4</div>
+              <div class="step-details">
+                <strong>Tamper Check</strong>
+                <span id="pStep4Desc">Verify record integrity</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Right Panel: Attestation & Verification Results -->
-        <div class="panel-stack">
-          <!-- Live Results Container -->
-          <div id="resultsContainer" class="results-stack hidden">
-            <!-- Card 1: Biometric Signature -->
-            <div class="result-card">
-              <div class="card-top">
-                <div class="card-title-wrap">
-                  <span class="section-tag">Stage 01</span>
-                  <h3>Biometric Signature Analysis</h3>
+        <!-- Right Output Stack -->
+        <div class="results-3d-stage">
+          <!-- Empty State Container -->
+          <div id="emptyState" class="empty-3d-card">
+            <div class="empty-3d-orb">
+              <div class="hologram-shield">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <path d="M9 12l2 2 4-4"/>
+                </svg>
+              </div>
+            </div>
+            <h3>Ready to Scan</h3>
+            <p>Upload a photo or select a sample on the left to run the verification pipeline.</p>
+          </div>
+
+          <!-- Dynamic Results Container -->
+          <div id="resultsContainer" class="results-3d-stack hidden">
+            <!-- Stage 1: Face Detection Card -->
+            <div class="card-3d">
+              <div class="card-glow-layer"></div>
+              <div class="card-3d-header">
+                <div class="stage-indicator">
+                  <span class="stage-num">1</span>
+                  <div>
+                    <h3>Face Detection</h3>
+                    <span class="stage-desc">Detected face & features</span>
+                  </div>
                 </div>
-                <div class="pill pill-success" id="faceConfidenceBadge">
-                  <span class="pill-dot"></span> Confidence: 99.4%
-                </div>
+                <div class="badge-3d badge-green" id="faceConfidenceBadge">-</div>
               </div>
 
-              <div class="biometric-content">
-                <div class="crop-frame">
-                  <img id="faceCropImg" src="" alt="Aligned Biometric Crop">
-                  <span class="crop-caption">Aligned Facial Crop</span>
+              <div class="biometric-3d-grid">
+                <div class="crop-3d-box">
+                  <div class="crop-hologram-frame">
+                    <img id="faceCropImg" src="" alt="Aligned Crop">
+                    <div class="crop-scanlines"></div>
+                  </div>
+                  <span class="crop-tag">Face Crop</span>
                 </div>
-                <div class="detail-grid">
-                  <div class="detail-row">
-                    <span class="detail-label">Facial Bounding Region</span>
-                    <span class="detail-value mono" id="faceBboxVal">[162, 159, 433, 571]</span>
+                
+                <div class="meta-3d-list">
+                  <div class="meta-3d-item">
+                    <span class="meta-3d-key">Bounding Box</span>
+                    <span class="meta-3d-val mono" id="faceBboxVal">-</span>
                   </div>
-                  <div class="detail-row">
-                    <span class="detail-label">Biometric Feature Matrix</span>
-                    <span class="detail-value">Verified Normalized Vector</span>
+                  <div class="meta-3d-item">
+                    <span class="meta-3d-key">Image SHA-256</span>
+                    <span class="meta-3d-val mono truncate" id="faceShaVal">-</span>
                   </div>
-                  <div class="detail-row">
-                    <span class="detail-label">Source Digest (SHA-256)</span>
-                    <span class="detail-value mono truncate" id="faceShaVal">-</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">Audit Index</span>
-                    <span class="detail-value text-accent">Indexed in Secure Attestation Ledger</span>
+                  <div class="meta-3d-item">
+                    <span class="meta-3d-key">Embedding</span>
+                    <span class="meta-3d-val text-glow-green">512-D Normalized Vector</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Card 2: Discovered Media Match -->
-            <div class="result-card">
-              <div class="card-top">
-                <div class="card-title-wrap">
-                  <span class="section-tag">Stage 02</span>
-                  <h3>Discovered Public Media Match</h3>
+            <!-- Stage 2: Web Match Card -->
+            <div class="card-3d">
+              <div class="card-glow-layer"></div>
+              <div class="card-3d-header">
+                <div class="stage-indicator">
+                  <span class="stage-num">2</span>
+                  <div>
+                    <h3>Web Match</h3>
+                    <span class="stage-desc">Matching public profile or post</span>
+                  </div>
                 </div>
-                <div class="pill pill-blue" id="matchPlatformBadge">Verified Source</div>
+                <div class="badge-3d badge-cyan" id="matchPlatformBadge">-</div>
               </div>
 
-              <div class="media-match-card">
-                <div class="match-profile">
-                  <div class="avatar-circle" id="authorAvatar">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                      <circle cx="12" cy="7" r="4"/>
-                    </svg>
+              <div class="media-3d-body">
+                <div class="media-profile-header">
+                  <div class="media-avatar-3d" id="authorAvatar">
+                    <img id="matchAvatarImg" class="media-avatar-img hidden" alt="Match Profile">
+                    <div id="matchAvatarPlaceholder" class="media-avatar-placeholder">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                      </svg>
+                    </div>
                   </div>
-                  <div class="match-meta">
-                    <h4 id="authorName">Published Entity</h4>
-                    <span class="match-handle mono" id="authorHandle">@verified_record</span>
+                  <div class="media-profile-info">
+                    <h4 id="authorName">-</h4>
+                    <span class="mono" id="authorHandle">-</span>
                   </div>
-                  <div class="similarity-badge">
-                    <span class="sim-title">Visual Match</span>
-                    <span class="sim-percent" id="similarityScore">94.8%</span>
+                  <div class="sim-pill-3d">
+                    <span class="sim-sub">SIMILARITY</span>
+                    <span class="sim-val" id="similarityScore">-</span>
                   </div>
                 </div>
 
-                <p class="match-caption" id="postCaption">
-                  Decentralized identity verification and biometric face attestation records verified across public media networks.
-                </p>
+                <!-- Discovered Match Image Preview -->
+                <div id="matchImagePreviewContainer" class="match-image-preview hidden">
+                  <img id="matchPreviewImg" class="match-preview-img" alt="Discovered Face">
+                  <div class="match-preview-overlay">
+                    <span class="match-preview-tag" id="matchPreviewTag">Discovered Web Image</span>
+                    <a href="#" target="_blank" id="previewUrlLink" class="preview-external-link">View Full Post ↗</a>
+                  </div>
+                </div>
 
-                <div class="match-footer">
-                  <a href="#" target="_blank" id="postUrlLink" class="btn-external">
-                    <span>View Public Source</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                      <polyline points="15 3 21 3 21 9"/>
-                      <line x1="10" y1="14" x2="21" y2="3"/>
-                    </svg>
-                  </a>
-                  <span class="match-time mono" id="postTimestamp">2024-05-14T09:15:30Z</span>
+                <p class="media-snippet" id="postCaption">-</p>
+
+                <div class="media-footer-3d">
+                  <div class="media-actions-left">
+                    <a href="#" target="_blank" id="postUrlLink" class="btn-link-3d hidden">
+                      <span>View Source</span>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                        <polyline points="15 3 21 3 21 9"/>
+                        <line x1="10" y1="14" x2="21" y2="3"/>
+                      </svg>
+                    </a>
+                    <button type="button" id="btnToggleCandidates" class="btn-toggle-candidates hidden">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                      </svg>
+                      <span>Show All Matches (<span id="candidatesCount">0</span>)</span>
+                      <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
+                    </button>
+                  </div>
+                  <span class="mono text-muted" id="postTimestamp"></span>
+                </div>
+
+                <!-- Expandable Drawer for Top K Candidates -->
+                <div id="candidatesDrawer" class="candidates-drawer hidden">
+                  <div class="candidates-drawer-header">
+                    <span class="drawer-title">Top Reverse Search Candidates</span>
+                    <span class="drawer-subtitle">Ranked by facial similarity</span>
+                  </div>
+                  <div class="candidates-grid" id="candidatesGrid"></div>
                 </div>
               </div>
             </div>
 
-            <!-- Card 3: Blockchain Attestation -->
-            <div class="result-card">
-              <div class="card-top">
-                <div class="card-title-wrap">
-                  <span class="section-tag">Stage 03</span>
-                  <h3>Immutable Smart Contract Attestation</h3>
+            <!-- Stage 3: Blockchain Attestation Card -->
+            <div class="card-3d">
+              <div class="card-glow-layer"></div>
+              <div class="card-3d-header">
+                <div class="stage-indicator">
+                  <span class="stage-num">3</span>
+                  <div>
+                    <h3>Blockchain Record</h3>
+                    <span class="stage-desc">Attestation stored on smart contract</span>
+                  </div>
                 </div>
-                <div class="pill pill-purple" id="networkBadge">EVM Consensus Layer</div>
+                <div class="badge-3d badge-purple" id="networkBadge">EVM</div>
               </div>
 
-              <div class="ledger-stat-grid">
-                <div class="stat-card">
-                  <span class="stat-header">Transaction Hash</span>
-                  <span class="stat-body mono truncate" id="txHashVal">0x...</span>
+              <div class="blockchain-3d-matrix">
+                <div class="matrix-cell">
+                  <span class="cell-label">Transaction Hash</span>
+                  <span class="cell-data mono truncate" id="txHashVal">-</span>
                 </div>
-                <div class="stat-card">
-                  <span class="stat-header">Block Height</span>
-                  <span class="stat-body mono text-purple" id="blockNumVal">#19482012</span>
+                <div class="matrix-cell">
+                  <span class="cell-label">Block Number</span>
+                  <span class="cell-data mono text-glow-purple" id="blockNumVal">-</span>
                 </div>
-                <div class="stat-card">
-                  <span class="stat-header">Registry Contract</span>
-                  <span class="stat-body mono truncate" id="contractVal">0x71C...2F1a</span>
+                <div class="matrix-cell">
+                  <span class="cell-label">Contract Address</span>
+                  <span class="cell-data mono truncate" id="contractVal">-</span>
                 </div>
-                <div class="stat-card">
-                  <span class="stat-header">Payload Hash (Keccak-256)</span>
-                  <span class="stat-body mono truncate" id="payloadHashVal">0x...</span>
+                <div class="matrix-cell">
+                  <span class="cell-label">Payload Hash</span>
+                  <span class="cell-data mono truncate" id="payloadHashVal">-</span>
                 </div>
               </div>
             </div>
 
-            <!-- Card 4: Verification Proof & Interactive Security Audit -->
-            <div class="result-card verification-panel" id="verificationCard">
-              <div class="card-top">
-                <div class="card-title-wrap">
-                  <span class="section-tag">Stage 04</span>
-                  <h3>Cryptographic Integrity & Tamper Audit</h3>
+            <!-- Stage 4: Tamper Verification Card -->
+            <div class="card-3d audit-card-3d" id="verificationCard">
+              <div class="card-glow-layer"></div>
+              <div class="card-3d-header">
+                <div class="stage-indicator">
+                  <span class="stage-num">4</span>
+                  <div>
+                    <h3>Tamper Verification</h3>
+                    <span class="stage-desc">Check data against blockchain record</span>
+                  </div>
                 </div>
-                <div class="pill pill-success" id="verStatusBadge">
-                  <span class="pill-dot"></span> 100% Cryptographically Verified
+                <div class="badge-3d badge-green" id="verStatusBadge">
+                  Verified
                 </div>
               </div>
 
-              <div class="audit-banner success" id="verBanner">
-                <div class="banner-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <div class="audit-banner-3d success" id="verBanner">
+                <div class="audit-icon-3d">
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                     <polyline points="9 12 11 14 15 10"/>
                   </svg>
                 </div>
-                <div class="banner-info">
-                  <h4 id="verTitle">Cryptographic Proof Validated On-Chain</h4>
+                <div class="audit-text">
+                  <h4 id="verTitle">Data Verified</h4>
                   <p id="verDescription">
-                    Discovered payload data and biometric hashes exactly match the immutable record committed on the decentralized ledger.
+                    The current data matches the blockchain record exactly.
                   </p>
                 </div>
               </div>
 
-              <!-- Interactive Tamper Testing Box -->
-              <div class="security-audit-box">
-                <div class="audit-control-header">
-                  <div>
-                    <h4>Interactive Tamper-Evidence Audit</h4>
-                    <p>Demonstrate cryptographic tamper detection by simulating an unauthorized payload modification.</p>
-                  </div>
-                  <button id="btnTamperTest" class="btn-audit">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                      <line x1="12" y1="9" x2="12" y2="13"/>
-                      <line x1="12" y1="17" x2="12.01" y2="17"/>
-                    </svg>
-                    <span>Simulate Data Tampering</span>
-                  </button>
+              <!-- Interactive Tamper Testing Control -->
+              <div class="tamper-control-3d">
+                <div class="tamper-info">
+                  <strong>Test Tamper Detection</strong>
+                  <p>Simulate modifying data to see if the blockchain detects tampering.</p>
                 </div>
-                <div id="tamperDiffContainer" class="tamper-diff-box hidden"></div>
+                <button id="btnTamperTest" class="btn-tamper-3d">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                  </svg>
+                  <span>Simulate Tampering</span>
+                </button>
               </div>
-            </div>
-          </div>
 
-          <!-- Empty Terminal State -->
-          <div id="emptyState" class="empty-terminal-card">
-            <div class="empty-glow">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-              </svg>
+              <div id="tamperDiffContainer" class="tamper-table-wrap hidden"></div>
             </div>
-            <h3>Terminal Ready for Verification</h3>
-            <p>Upload a subject photo or choose from the verified directory to initiate biometric extraction, global web cross-referencing, and smart contract attestation.</p>
           </div>
         </div>
       </div>
+      </div>
+      <!-- End Tab Panel 1: Pipeline -->
 
-      <!-- Institutional Attestation Ledger -->
-      <section class="ledger-section">
-        <div class="ledger-header">
-          <div class="ledger-title-group">
-            <h3>Immutable Attestation Registry</h3>
-            <p>Cryptographic record of on-chain verification receipts</p>
+      <!-- Tab Panel 2: Verification History -->
+      <div id="tabContentHistory" class="tab-content-panel hidden">
+        <section class="ledger-card-3d">
+          <div class="ledger-header-3d">
+            <div>
+              <h3>Verification History</h3>
+              <p>Recent records stored on the blockchain</p>
+            </div>
+            <button id="btnRefreshHistory" class="btn-refresh-3d">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"/>
+                <polyline points="1 20 1 14 7 14"/>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+              </svg>
+              <span>Refresh</span>
+            </button>
           </div>
-          <button id="btnRefreshHistory" class="btn-refresh">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="23 4 23 10 17 10"/>
-              <polyline points="1 20 1 14 7 14"/>
-              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-            </svg>
-            <span>Refresh Ledger</span>
-          </button>
-        </div>
 
-        <div class="table-frame">
-          <table class="attestation-table">
-            <thead>
-              <tr>
-                <th>Attestation ID</th>
-                <th>Source Platform</th>
-                <th>Verified Entity</th>
-                <th>Biometric Match</th>
-                <th>Transaction Hash</th>
-                <th>Block Height</th>
-                <th>Audit Status</th>
-                <th>Integrity</th>
-              </tr>
-            </thead>
-            <tbody id="historyTableBody">
-              <tr>
-                <td colspan="8" class="table-empty-msg">Querying on-chain ledger records...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
+          <div class="table-3d-frame">
+            <table class="table-3d">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Platform</th>
+                  <th>Profile</th>
+                  <th>Similarity</th>
+                  <th>Transaction</th>
+                  <th>Block</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody">
+                <tr>
+                  <td colspan="8" class="table-loading-3d">Loading verification history...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+      <!-- End Tab Panel 2: History -->
     </main>
 
-    <!-- Institutional Footer -->
-    <footer class="footer">
+    <!-- Footer -->
+    <footer class="footer-3d">
       <div class="footer-inner">
-        <span>Aegis Identity • Decentralized Biometric Attestation Protocol</span>
-        <div class="footer-links">
-          <span>Smart Contract Verified</span>
-          <span>•</span>
-          <span>Cryptographic Proof Engine</span>
-          <span>•</span>
-          <span>Zero-Knowledge Architecture Ready</span>
+        <span>Face Identification & Blockchain Verification Pipeline</span>
+        <div class="footer-tags">
+          <span class="tag-pill">EVM Blockchain</span>
+          <span class="tag-pill">Tamper Detection</span>
+          <span class="tag-pill">Biometric Verification</span>
         </div>
       </div>
     </footer>
   </div>
 
-  <script src="/static/app.js"></script>
+  <script src="/static/app.js?v=20260904_11"></script>
 </body>
 </html>

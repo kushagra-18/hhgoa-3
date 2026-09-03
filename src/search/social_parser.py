@@ -46,6 +46,7 @@ class DiscoveredPost:
     def to_dict(self) -> Dict[str, Any]:
         data = asdict(self)
         data["payload_hash"] = self.compute_payload_hash()
+        data["top_candidates"] = self.raw_metadata.get("top_candidates", [])
         return data
 
 

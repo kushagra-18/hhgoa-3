@@ -17,6 +17,9 @@ data/crops/
 data/cache/
 data/*.db
 data/*.sqlite
+data/serpapi_*.json
+data/serpapi_last_response.json
+data/logs/
 
 # Environment secrets
 .env

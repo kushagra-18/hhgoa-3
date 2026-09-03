@@ -20,19 +20,11 @@ class LiveOpenWebSearchProvider(BaseSearchProvider):
     def __init__(self):
         self.headers = {"User-Agent": "AegisIdentityBot/1.0 (https://github.com/)"}
 
-    def search(self, image_path: str, image_bytes: Optional[bytes] = None) -> List[DiscoveredPost]:
+    def search(self, image_path: str, image_bytes: Optional[bytes] = None, query_terms: Optional[List[str]] = None) -> List[DiscoveredPost]:
         matches: List[DiscoveredPost] = []
-        filename = os.path.basename(image_path).lower()
-
-        # Derive search keywords from image context or facial biometrics query
-        if "sataboris" in filename:
-            query_terms = ["Vitalik Buterin", "Ethereum", "blockchain identity"]
-        elif "elena" in filename:
-            query_terms = ["Yann LeCun", "Deep learning biometrics", "Facial recognition system"]
-        elif "alex" in filename:
-            query_terms = ["Proof of personhood", "Biometric attestation", "Digital identity"]
-        else:
-            query_terms = ["Facial recognition system", "Biometrics", "Proof of personhood"]
+        if not query_terms:
+            # Without explicit textual query terms or reverse search metadata, open web cannot guess identity
+            return []
 
         # 1. Live Wikipedia Search
         try:

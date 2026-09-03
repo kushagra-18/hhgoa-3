@@ -3,7 +3,9 @@ import json
 import logging
 from dataclasses import dataclass, asdict
 from pathlib import Path
-from typing import Optional, Dict, Any, Union
+from typing import Optional, Dict, Any, Union, Iterator, Callable
+import queue
+import threading
 import numpy as np
 
 from src.config import settings
@@ -57,6 +59,7 @@ class FaceVerificationPipeline:
         image_input: Union[str, Path, bytes, np.ndarray],
         save_db: bool = True,
         metadata_uri: Optional[str] = None,
+        progress_callback: Optional[Callable[[Dict[str, Any]], None]] = None,
     ) -> PipelineResult:
         """
         Execute full end-to-end pipeline:
@@ -69,23 +72,60 @@ class FaceVerificationPipeline:
         start_time = time.time()
         logger.info("Starting Face Identification & Blockchain Verification Pipeline...")
 
+        if progress_callback:
+            progress_callback({
+                "type": "progress",
+                "step": 1,
+                "total_steps": 5,
+                "percent": 15,
+                "title": "Finding Face",
+                "message": "Detecting face and analyzing features...",
+            })
+
         # Step 1: Face Detection & Encoding
         face_result = self.face_detector.detect_and_encode(image_input)
         if not face_result.detected:
+            if progress_callback:
+                progress_callback({
+                    "type": "error",
+                    "step": 1,
+                    "percent": 100,
+                    "title": "No Face Found",
+                    "message": face_result.error_message or "No face detected in image. Please try another photo.",
+                })
             return PipelineResult(
                 success=False,
                 elapsed_seconds=round(time.time() - start_time, 3),
                 error_message=face_result.error_message or "No face detected in input image.",
             )
 
-        # Step 2: Reverse Image / Social Media Search
+        if progress_callback:
+            progress_callback({
+                "type": "progress",
+                "step": 2,
+                "total_steps": 5,
+                "percent": 30,
+                "title": "Face Located",
+                "message": "Face located. Searching public web for visual matches...",
+            })
+
+        # Step 2: Reverse Image / Social Media Search & Batch Scoring
         input_path_str = str(image_input) if isinstance(image_input, (str, Path)) else "memory_buffer"
         discovered_post = self.search_engine.search_for_matching_post(
             image_path=input_path_str,
             query_face_result=face_result,
+            progress_callback=progress_callback,
         )
 
         if not discovered_post:
+            if progress_callback:
+                progress_callback({
+                    "type": "error",
+                    "step": 3,
+                    "percent": 100,
+                    "title": "No Match",
+                    "message": "Failed to discover matching public photos.",
+                })
             return PipelineResult(
                 success=False,
                 face_scan={
@@ -98,6 +138,16 @@ class FaceVerificationPipeline:
             )
 
         # Step 3: Blockchain Attestation Anchor
+        if progress_callback:
+            progress_callback({
+                "type": "progress",
+                "step": 4,
+                "total_steps": 5,
+                "percent": 80,
+                "title": "Recording Attestation",
+                "message": "Recording attestation on blockchain...",
+            })
+
         attestation_receipt = self.anchor.anchor_attestation(
             post=discovered_post,
             face_result=face_result,
@@ -105,6 +155,16 @@ class FaceVerificationPipeline:
         )
 
         # Step 4: Verification Check against On-Chain State
+        if progress_callback:
+            progress_callback({
+                "type": "progress",
+                "step": 5,
+                "total_steps": 5,
+                "percent": 92,
+                "title": "Verifying Record",
+                "message": "Checking cryptographic integrity against blockchain...",
+            })
+
         verification_result = self.verifier.verify(
             post=discovered_post,
             face_result=face_result,
@@ -180,7 +240,7 @@ class FaceVerificationPipeline:
         elapsed = round(time.time() - start_time, 3)
         logger.info(f"Pipeline finished successfully in {elapsed}s.")
 
-        return PipelineResult(
+        final_res = PipelineResult(
             success=True,
             face_scan=db_scan_dict or {
                 "bbox": face_result.bbox,
@@ -195,6 +255,64 @@ class FaceVerificationPipeline:
             verification=verification_result.to_dict(),
             elapsed_seconds=elapsed,
         )
+
+        if progress_callback:
+            progress_callback({
+                "type": "complete",
+                "step": 5,
+                "percent": 100,
+                "title": "Complete",
+                "message": "Verification complete!",
+                "result": final_res.to_dict(),
+            })
+
+        return final_res
+
+    def run_stream(
+        self,
+        image_input: Union[str, Path, bytes, np.ndarray],
+        save_db: bool = True,
+        metadata_uri: Optional[str] = None,
+    ) -> Iterator[Dict[str, Any]]:
+        """
+        Stream real-time progress events and the final verification outcome via generator.
+        """
+        event_queue: queue.Queue = queue.Queue()
+
+        def _worker():
+            try:
+                self.run(
+                    image_input=image_input,
+                    save_db=save_db,
+                    metadata_uri=metadata_uri,
+                    progress_callback=event_queue.put,
+                )
+            except Exception as e:
+                logger.exception("Error during streaming pipeline run")
+                event_queue.put({
+                    "type": "error",
+                    "step": 1,
+                    "percent": 100,
+                    "title": "Error",
+                    "message": str(e),
+                })
+            finally:
+                event_queue.put(None)
+
+        worker_thread = threading.Thread(target=_worker, daemon=True)
+        worker_thread.start()
+
+        while True:
+            try:
+                ev = event_queue.get(timeout=0.1)
+                if ev is None:
+                    break
+                yield ev
+                if ev.get("type") in ("complete", "error"):
+                    break
+            except queue.Empty:
+                if not worker_thread.is_alive() and event_queue.empty():
+                    break
 
     def test_tampering_for_attestation(self, attestation_id: int) -> Dict[str, Any]:
         """Runs a live tamper simulation on a recorded attestation."""

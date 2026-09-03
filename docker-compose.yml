@@ -35,9 +35,11 @@ services:
       - INSIGHTFACE_MODEL_NAME=buffalo_l
       - INSIGHTFACE_DET_SIZE=640
       - APP_ENV=development
-      - DEBUG=True
       - HOST=0.0.0.0
       - PORT=8000
+      - SERPAPI_API_KEY=${SERPAPI_API_KEY:-07baa74b32000d48a53f77fde2089f03cb56eee85688355b971b20b92a8bb2ba}
+    env_file:
+      - .env
     command: uvicorn src.api.app:app --host 0.0.0.0 --port 8000 --reload
     volumes:
       - ./src:/app/src

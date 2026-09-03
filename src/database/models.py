@@ -89,6 +89,14 @@ class SearchMatch(Base):
     attestations = relationship("BlockchainAttestation", back_populates="search_match", cascade="all, delete-orphan")
 
     def to_dict(self) -> Dict[str, Any]:
+        raw_meta = {}
+        if self.raw_metadata:
+            try:
+                import json
+                raw_meta = json.loads(self.raw_metadata) if isinstance(self.raw_metadata, str) else self.raw_metadata
+            except Exception:
+                raw_meta = {}
+
         return {
             "id": self.id,
             "scan_id": self.scan_id,
@@ -101,6 +109,7 @@ class SearchMatch(Base):
             "post_image_url": self.post_image_url,
             "post_image_sha256": self.post_image_sha256,
             "visual_similarity_score": self.visual_similarity_score,
+            "top_candidates": raw_meta.get("top_candidates", []) if isinstance(raw_meta, dict) else [],
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
 

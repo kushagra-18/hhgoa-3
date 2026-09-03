@@ -7,7 +7,8 @@ from typing import Optional, List, Dict, Any
 from fastapi import FastAPI, File, UploadFile, Depends, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+import json
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from sqlalchemy.orm import Session
 
 from src.config import settings
@@ -71,6 +72,45 @@ async def run_pipeline(
         return result.to_dict()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/pipeline/run-stream")
+async def run_pipeline_stream(
+    file: UploadFile = File(...),
+):
+    """Execute end-to-end pipeline streaming real-time progress events via SSE."""
+    file_ext = Path(file.filename or "image.jpg").suffix or ".jpg"
+    filename = f"upload_{uuid.uuid4().hex[:12]}{file_ext}"
+    dest_path = settings.UPLOADS_DIR / filename
+
+    try:
+        with open(dest_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save upload: {e}")
+
+    def event_generator():
+        try:
+            for event in pipeline_service.run_stream(image_input=str(dest_path), save_db=True):
+                yield f"data: {json.dumps(event)}\n\n"
+        except Exception as e:
+            err_dict = {
+                "type": "error",
+                "percent": 100,
+                "title": "Error",
+                "message": str(e),
+            }
+            yield f"data: {json.dumps(err_dict)}\n\n"
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @app.post("/api/pipeline/tamper-test/{attestation_id}")
