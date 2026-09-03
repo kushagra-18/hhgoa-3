@@ -22,9 +22,15 @@ class SearchEngine:
         self,
         face_detector: Optional[FaceDetector] = None,
         providers: Optional[List[BaseSearchProvider]] = None,
+        similarity_threshold: Optional[float] = None,
     ):
         self.face_detector = face_detector or FaceDetector()
         self.providers = providers or SearchProviderFactory.get_enabled_providers()
+        self.similarity_threshold = (
+            similarity_threshold
+            if similarity_threshold is not None
+            else settings.SIMILARITY_THRESHOLD
+        )
 
     def _get_reference_profiles(self) -> List[dict]:
         """Lazy load and cache embeddings for known sample profiles."""
@@ -147,12 +153,21 @@ class SearchEngine:
             with ThreadPoolExecutor(max_workers=6) as executor:
                 list(executor.map(_score_candidate, discovered_candidates))
 
+            threshold = self.similarity_threshold
+
             # Sort candidates by visual similarity score descending
             scored_candidates = sorted(
                 discovered_candidates,
                 key=lambda c: c.visual_similarity_score or 0.0,
                 reverse=True,
             )
+
+            # Filter candidates: strictly exclude any below the similarity threshold
+            qualifying_candidates = [
+                c for c in scored_candidates
+                if (c.visual_similarity_score or 0.0) >= threshold
+            ]
+
             top_k_candidates = [
                 {
                     "rank": idx + 1,
@@ -165,18 +180,23 @@ class SearchEngine:
                     "similarity_pct": round((c.visual_similarity_score or 0.0) * 100, 1),
                     "snippet": c.post_caption,
                 }
-                for idx, c in enumerate(scored_candidates[:12])
+                for idx, c in enumerate(qualifying_candidates[:12])
             ]
 
-            if scored_candidates:
-                best_match = scored_candidates[0]
+            if qualifying_candidates:
+                best_match = qualifying_candidates[0]
                 best_match.raw_metadata["top_candidates"] = top_k_candidates
+                best_match.raw_metadata["similarity_threshold"] = threshold
                 logger.info(
-                    f"Closest match: '{best_match.author_name}' with similarity {best_match.visual_similarity_score}"
+                    f"Closest matching candidate: '{best_match.author_name}' with similarity {best_match.visual_similarity_score} (Threshold: {threshold})"
                 )
-                if (best_match.visual_similarity_score or 0.0) >= 0.40:
-                    return best_match
+                return best_match
+            elif scored_candidates:
+                logger.info(
+                    f"Highest candidate similarity {scored_candidates[0].visual_similarity_score} is below threshold {threshold}. Filtered out."
+                )
         else:
+            threshold = self.similarity_threshold
             top_k_candidates = []
 
         # 3. Check reference profiles for high-confidence biometric match
@@ -190,7 +210,7 @@ class SearchEngine:
                         best_sim = sim
                         best_profile = ref
 
-            if best_profile and best_sim >= 0.55:
+            if best_profile and best_sim >= threshold:
                 return DiscoveredPost(
                     platform=best_profile["platform"],
                     post_url=best_profile["post_url"],
@@ -200,18 +220,28 @@ class SearchEngine:
                     post_timestamp=best_profile["post_timestamp"],
                     post_image_url=best_profile["post_image_url"],
                     visual_similarity_score=round(float(best_sim), 4),
-                    raw_metadata={"source": "BiometricReferenceMatcher", "similarity": float(best_sim), "top_candidates": top_k_candidates},
+                    raw_metadata={
+                        "source": "BiometricReferenceMatcher",
+                        "similarity": float(best_sim),
+                        "similarity_threshold": threshold,
+                        "top_candidates": top_k_candidates,
+                    },
                 )
 
         # 4. No match found above threshold - return honest un-matched record
+        threshold_pct = round(threshold * 100, 1)
         return DiscoveredPost(
             platform="Web",
             post_url="",
             author_handle="-",
             author_name="No Match Found",
-            post_caption="No matching public profile or social media post was found for this face scan.",
+            post_caption=f"No matching public profile or social media post was found above the {threshold_pct}% similarity threshold.",
             post_timestamp="",
             post_image_url="",
             visual_similarity_score=0.0,
-            raw_metadata={"status": "not_found", "top_candidates": top_k_candidates},
+            raw_metadata={
+                "status": "not_found",
+                "similarity_threshold": threshold,
+                "top_candidates": top_k_candidates,
+            },
         )

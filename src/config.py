@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import field_validator
 
 
 class Settings(BaseSettings):
@@ -37,6 +38,22 @@ class Settings(BaseSettings):
     SERPER_API_KEY: str = ""
     TAVILY_API_KEY: str = ""
     FIRECRAWL_API_KEY: str = ""
+
+    # Face Match Similarity Threshold (default: 0.70 / 70%)
+    SIMILARITY_THRESHOLD: float = 0.70
+
+    @field_validator("SIMILARITY_THRESHOLD", mode="before")
+    @classmethod
+    def parse_similarity_threshold(cls, v):
+        if v is None:
+            return 0.70
+        try:
+            val = float(v)
+            if val > 1.0:
+                val = val / 100.0
+            return max(0.0, min(1.0, val))
+        except (ValueError, TypeError):
+            return 0.70
 
     model_config = SettingsConfigDict(
         env_file=".env",

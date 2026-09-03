@@ -48,9 +48,13 @@ class FaceVerificationPipeline:
         search_engine: Optional[SearchEngine] = None,
         blockchain_anchor: Optional[BlockchainAnchor] = None,
         blockchain_verifier: Optional[BlockchainVerifier] = None,
+        similarity_threshold: Optional[float] = None,
     ):
         self.face_detector = face_detector or FaceDetector()
-        self.search_engine = search_engine or SearchEngine(face_detector=self.face_detector)
+        self.search_engine = search_engine or SearchEngine(
+            face_detector=self.face_detector,
+            similarity_threshold=similarity_threshold,
+        )
         self.anchor = blockchain_anchor or BlockchainAnchor()
         self.verifier = blockchain_verifier or BlockchainVerifier(anchor=self.anchor)
 

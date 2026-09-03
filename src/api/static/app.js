@@ -609,8 +609,13 @@ function initAppLogic() {
       postTimestamp.textContent = "";
     }
 
-    // Render Top K Candidates Gallery
-    const candidates = match.top_candidates || (match.raw_metadata && match.raw_metadata.top_candidates) || [];
+    // Render Top K Candidates Gallery (Enforcing Similarity Threshold)
+    const activeThreshold = (match.raw_metadata && match.raw_metadata.similarity_threshold !== undefined)
+      ? match.raw_metadata.similarity_threshold
+      : 0.70;
+    const rawCandidates = match.top_candidates || (match.raw_metadata && match.raw_metadata.top_candidates) || [];
+    const candidates = rawCandidates.filter((cand) => (cand.similarity || 0) >= activeThreshold);
+
     if (candidates && candidates.length > 0) {
       if (btnToggleCandidates) {
         btnToggleCandidates.classList.remove("hidden");
@@ -623,13 +628,12 @@ function initAppLogic() {
         candidatesGrid.innerHTML = candidates.map((cand) => {
           const isTopMatch = cand.similarity === match.visual_similarity_score;
           const simPct = cand.similarity_pct !== undefined ? cand.similarity_pct : ((cand.similarity || 0) * 100).toFixed(1);
-          const isLow = (cand.similarity || 0) < 0.40;
           return `
             <div class="candidate-card ${isTopMatch ? "is-top" : ""}">
               <div class="candidate-thumb-wrap">
                 <img src="${cand.image_url}" alt="${cand.title || "Match"}" class="candidate-thumb" loading="lazy" onerror="this.style.display='none'">
                 <span class="candidate-rank-badge">#${cand.rank || 1}</span>
-                <span class="candidate-sim-pill ${isLow ? "low" : ""}">${simPct}%</span>
+                <span class="candidate-sim-pill">${simPct}%</span>
               </div>
               <div class="candidate-body">
                 <div class="candidate-title" title="${cand.title || ""}">${cand.title || "Web Result"}</div>
