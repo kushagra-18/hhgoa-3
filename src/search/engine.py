@@ -210,7 +210,7 @@ class SearchEngine:
                     "similarity_pct": round((c.visual_similarity_score or 0.0) * 100, 1),
                     "snippet": c.post_caption,
                 }
-                for idx, c in enumerate(qualifying_candidates[:12])
+                for idx, c in enumerate(qualifying_candidates[:30])
             ]
 
             if qualifying_candidates:

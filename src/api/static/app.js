@@ -1,228 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Initialize 3D Engine & UI Controllers
-  initThreeJSBackground();
-  initTiltPhysics();
   initAppLogic();
 });
 
 /* =========================================================================
-   1. THREE.JS 3D INTERACTIVE HOLOGRAPHIC CYBER GLOBE WITH PARALLAX
-   ========================================================================= */
-function initThreeJSBackground() {
-  const canvas = document.getElementById("webglCanvas");
-  if (!canvas || typeof THREE === "undefined") return;
-
-  const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x05070e, 0.0035);
-
-  const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.set(0, 0, 115);
-
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-  // Globe Group for consolidated rotation & parallax tilt
-  const globeGroup = new THREE.Group();
-  globeGroup.position.set(0, -8, -15);
-  scene.add(globeGroup);
-
-  // Soft Dot Texture Generator
-  const createSoftDotTexture = () => {
-    const c = document.createElement("canvas");
-    c.width = 64;
-    c.height = 64;
-    const ctx = c.getContext("2d");
-    const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-    g.addColorStop(0, "rgba(255, 255, 255, 1)");
-    g.addColorStop(0.3, "rgba(56, 189, 248, 0.7)");
-    g.addColorStop(0.7, "rgba(14, 165, 233, 0.15)");
-    g.addColorStop(1, "rgba(0, 0, 0, 0)");
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.arc(32, 32, 32, 0, Math.PI * 2);
-    ctx.fill();
-    return new THREE.CanvasTexture(c);
-  };
-
-  const dotTexture = createSoftDotTexture();
-
-  // 1. Globe Base Sphere Wireframe (Latitude & Longitude Grid)
-  const globeRadius = 46;
-  const globeWireGeo = new THREE.SphereGeometry(globeRadius, 36, 36);
-  const globeWireMat = new THREE.MeshBasicMaterial({
-    color: 0x0284c7,
-    wireframe: true,
-    transparent: true,
-    opacity: 0.08,
-  });
-  const globeWireMesh = new THREE.Mesh(globeWireGeo, globeWireMat);
-  globeGroup.add(globeWireMesh);
-
-  // 2. Outer Atmospheric Holographic Glow Shell
-  const atmosphereGeo = new THREE.SphereGeometry(globeRadius * 1.04, 32, 32);
-  const atmosphereMat = new THREE.MeshBasicMaterial({
-    color: 0x38bdf8,
-    wireframe: true,
-    transparent: true,
-    opacity: 0.03,
-  });
-  const atmosphereMesh = new THREE.Mesh(atmosphereGeo, atmosphereMat);
-  globeGroup.add(atmosphereMesh);
-
-  // 3. Globe Surface Biometric Nodes (Fibonacci Spiral Distribution)
-  const nodeCount = 1100;
-  const nodePositions = new Float32Array(nodeCount * 3);
-  const nodeColors = new Float32Array(nodeCount * 3);
-
-  const colorCyan = new THREE.Color(0x38bdf8);
-  const colorIndigo = new THREE.Color(0x818cf8);
-  const colorEmerald = new THREE.Color(0x34d399);
-
-  for (let i = 0; i < nodeCount; i++) {
-    const phi = Math.acos(-1 + (2 * i) / nodeCount);
-    const theta = Math.sqrt(nodeCount * Math.PI) * phi;
-
-    const x = globeRadius * Math.cos(theta) * Math.sin(phi);
-    const y = globeRadius * Math.sin(theta) * Math.sin(phi);
-    const z = globeRadius * Math.cos(phi);
-
-    nodePositions[i * 3] = x;
-    nodePositions[i * 3 + 1] = y;
-    nodePositions[i * 3 + 2] = z;
-
-    const chosenColor = Math.random() > 0.6 ? colorCyan : (Math.random() > 0.3 ? colorIndigo : colorEmerald);
-    nodeColors[i * 3] = chosenColor.r;
-    nodeColors[i * 3 + 1] = chosenColor.g;
-    nodeColors[i * 3 + 2] = chosenColor.b;
-  }
-
-  const nodeGeo = new THREE.BufferGeometry();
-  nodeGeo.setAttribute("position", new THREE.BufferAttribute(nodePositions, 3));
-  nodeGeo.setAttribute("color", new THREE.BufferAttribute(nodeColors, 3));
-
-  const nodeMat = new THREE.PointsMaterial({
-    size: 2.4,
-    map: dotTexture,
-    vertexColors: true,
-    transparent: true,
-    opacity: 0.5,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false,
-  });
-
-  const nodePoints = new THREE.Points(nodeGeo, nodeMat);
-  globeGroup.add(nodePoints);
-
-  // 4. Glowing Inter-Continental Arcs (Decentralized Consensus Lines)
-  const arcMaterial = new THREE.LineBasicMaterial({
-    color: 0x38bdf8,
-    transparent: true,
-    opacity: 0.25,
-  });
-
-  for (let i = 0; i < 14; i++) {
-    const idx1 = Math.floor(Math.random() * nodeCount);
-    const idx2 = Math.floor(Math.random() * nodeCount);
-
-    const v1 = new THREE.Vector3(
-      nodePositions[idx1 * 3],
-      nodePositions[idx1 * 3 + 1],
-      nodePositions[idx1 * 3 + 2]
-    );
-    const v2 = new THREE.Vector3(
-      nodePositions[idx2 * 3],
-      nodePositions[idx2 * 3 + 1],
-      nodePositions[idx2 * 3 + 2]
-    );
-
-    // Midpoint elevated away from center to create 3D arc
-    const mid = new THREE.Vector3().addVectors(v1, v2).multiplyScalar(0.5);
-    const distance = v1.distanceTo(v2);
-    mid.normalize().multiplyScalar(globeRadius + distance * 0.25);
-
-    const curve = new THREE.QuadraticBezierCurve3(v1, mid, v2);
-    const curvePoints = curve.getPoints(24);
-    const curveGeo = new THREE.BufferGeometry().setFromPoints(curvePoints);
-    const arcLine = new THREE.Line(curveGeo, arcMaterial);
-    globeGroup.add(arcLine);
-  }
-
-  // 5. Surrounding Deep Space Particle Stars (Distant Layer)
-  const starCount = 350;
-  const starPositions = new Float32Array(starCount * 3);
-  for (let i = 0; i < starCount; i++) {
-    const r = 90 + Math.random() * 80;
-    const theta = Math.random() * Math.PI * 2;
-    const phi = Math.acos((Math.random() * 2) - 1);
-
-    starPositions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-    starPositions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-    starPositions[i * 3 + 2] = -40 + r * Math.cos(phi);
-  }
-
-  const starGeo = new THREE.BufferGeometry();
-  starGeo.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
-  const starMat = new THREE.PointsMaterial({
-    size: 1.6,
-    color: 0x94a3b8,
-    transparent: true,
-    opacity: 0.25,
-  });
-  const starField = new THREE.Points(starGeo, starMat);
-  scene.add(starField);
-
-  // Mouse Parallax Physics
-  let mouseX = 0;
-  let mouseY = 0;
-  let targetX = 0;
-  let targetY = 0;
-
-  window.addEventListener("mousemove", (e) => {
-    mouseX = (e.clientX - window.innerWidth / 2) * 0.04;
-    mouseY = (e.clientY - window.innerHeight / 2) * 0.04;
-  });
-
-  window.addEventListener("resize", () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  });
-
-  // Render Loop
-  function animate() {
-    requestAnimationFrame(animate);
-
-    targetX += (mouseX - targetX) * 0.035;
-    targetY += (mouseY - targetY) * 0.035;
-
-    // Continuous globe rotation on Y axis
-    globeGroup.rotation.y += 0.0012;
-    globeGroup.rotation.x = 0.15 + targetY * 0.008;
-    globeGroup.rotation.z = targetX * 0.005;
-
-    starField.rotation.y += 0.0002;
-
-    // Camera Parallax
-    camera.position.x = targetX * 0.35;
-    camera.position.y = -targetY * 0.35;
-    camera.lookAt(scene.position);
-
-    renderer.render(scene, camera);
-  }
-
-  animate();
-}
-
-/* =========================================================================
-   2. CARD PHYSICS
-   ========================================================================= */
-function initTiltPhysics() {
-  // Slanting and tilting on hover disabled
-}
-
-/* =========================================================================
-   3. APPLICATION LOGIC
+   APPLICATION LOGIC
    ========================================================================= */
 function initAppLogic() {
   const dropzone = document.getElementById("dropzone");
@@ -268,7 +49,7 @@ function initAppLogic() {
   const postTimestamp = document.getElementById("postTimestamp");
 
   const txHashVal = document.getElementById("txHashVal");
-  const blockNumVal = document.getElementById("blockNumVal");
+  const blockNumVal = document.getElementById("blockNumVal") || document.getElementById("blockNumberVal");
   const contractVal = document.getElementById("contractVal");
   const payloadHashVal = document.getElementById("payloadHashVal");
   const networkBadge = document.getElementById("networkBadge");
@@ -278,12 +59,21 @@ function initAppLogic() {
   const matchAvatarPlaceholder = document.getElementById("matchAvatarPlaceholder");
   const matchImagePreviewContainer = document.getElementById("matchImagePreviewContainer");
   const matchPreviewImg = document.getElementById("matchPreviewImg");
-  const previewUrlLink = document.getElementById("previewUrlLink");
+  const previewUrlLink = document.getElementById("previewUrlLink") || document.getElementById("matchPreviewLink");
   const matchPreviewTag = document.getElementById("matchPreviewTag");
   const btnToggleCandidates = document.getElementById("btnToggleCandidates");
   const candidatesCount = document.getElementById("candidatesCount");
+  const btnFilterSocial = document.getElementById("btnFilterSocial");
+  const socialCandidatesCount = document.getElementById("socialCandidatesCount");
   const candidatesDrawer = document.getElementById("candidatesDrawer");
   const candidatesGrid = document.getElementById("candidatesGrid");
+  const filterTabAll = document.getElementById("filterTabAll");
+  const filterTabSocial = document.getElementById("filterTabSocial");
+  const countTabAll = document.getElementById("countTabAll");
+  const countTabSocial = document.getElementById("countTabSocial");
+  const drawerTitle = document.getElementById("drawerTitle");
+  const drawerSubtitle = document.getElementById("drawerSubtitle");
+  const socialPlatformFilterRow = document.getElementById("socialPlatformFilterRow");
 
   // View Navigation Tabs
   const tabBtnPipeline = document.getElementById("tabBtnPipeline");
@@ -304,6 +94,8 @@ function initAppLogic() {
 
   let currentFile = null;
   let currentAttestationId = null;
+  let currentExtractedCandidates = [];
+  let currentFilterMode = "all";
 
   // Tab Navigation Handling
   if (tabBtnPipeline && tabBtnHistory) {
@@ -328,6 +120,37 @@ function initAppLogic() {
     btnToggleCandidates.addEventListener("click", () => {
       const isHidden = candidatesDrawer.classList.toggle("hidden");
       btnToggleCandidates.classList.toggle("active", !isHidden);
+      if (!isHidden) {
+        updateCandidatesDisplay("all");
+      }
+    });
+  }
+
+  // Dedicated Social Media Filter Toggle Button
+  if (btnFilterSocial && candidatesDrawer) {
+    btnFilterSocial.addEventListener("click", () => {
+      if (candidatesDrawer.classList.contains("hidden") || currentFilterMode !== "social") {
+        candidatesDrawer.classList.remove("hidden");
+        if (btnToggleCandidates) btnToggleCandidates.classList.add("active");
+        btnFilterSocial.classList.add("active");
+        updateCandidatesDisplay("social");
+      } else {
+        btnFilterSocial.classList.remove("active");
+        updateCandidatesDisplay("all");
+      }
+    });
+  }
+
+  // Filter Tabs inside Drawer
+  if (filterTabAll) {
+    filterTabAll.addEventListener("click", () => {
+      updateCandidatesDisplay("all");
+    });
+  }
+
+  if (filterTabSocial) {
+    filterTabSocial.addEventListener("click", () => {
+      updateCandidatesDisplay("social");
     });
   }
 
@@ -401,8 +224,8 @@ function initAppLogic() {
     if (btnText) btnText.textContent = "Starting...";
 
     resetStepper();
-    tamperDiffContainer.classList.add("hidden");
-    laserScanner.classList.add("scanning");
+    if (tamperDiffContainer) tamperDiffContainer.classList.add("hidden");
+    if (laserScanner) laserScanner.classList.add("scanning");
 
     setStepActive(1, "Detecting face & analyzing features...");
 
@@ -453,7 +276,7 @@ function initAppLogic() {
       }
 
     } catch (err) {
-      laserScanner.classList.remove("scanning");
+      if (laserScanner) laserScanner.classList.remove("scanning");
       btnRunPipeline.classList.remove("running");
       if (btnSpinner) btnSpinner.classList.add("hidden");
       if (btnPctBadge) btnPctBadge.classList.add("hidden");
@@ -500,7 +323,7 @@ function initAppLogic() {
       setStepCompleted(2);
       setStepCompleted(3);
       setStepCompleted(4);
-      laserScanner.classList.remove("scanning");
+      if (laserScanner) laserScanner.classList.remove("scanning");
 
       if (btnProgressLine) btnProgressLine.style.width = "100%";
       if (btnPctBadge) btnPctBadge.textContent = "100%";
@@ -521,7 +344,7 @@ function initAppLogic() {
       }, 1800);
 
     } else if (event.type === "error") {
-      laserScanner.classList.remove("scanning");
+      if (laserScanner) laserScanner.classList.remove("scanning");
       btnRunPipeline.classList.remove("running");
       if (btnSpinner) btnSpinner.classList.add("hidden");
       if (btnPctBadge) btnPctBadge.classList.add("hidden");
@@ -594,7 +417,7 @@ function initAppLogic() {
       similarityScore.textContent = `${sim}%`;
       if (simPill) simPill.classList.remove("unmatched");
     }
-    
+
     postCaption.textContent = match.post_caption || "-";
     if (!isUnmatched && match.post_url && match.post_url.startsWith("http")) {
       postUrlLink.href = match.post_url;
@@ -602,7 +425,7 @@ function initAppLogic() {
     } else {
       postUrlLink.classList.add("hidden");
     }
-    
+
     if (!isUnmatched && match.post_timestamp && match.post_timestamp !== "-") {
       postTimestamp.textContent = match.post_timestamp;
     } else {
@@ -614,53 +437,278 @@ function initAppLogic() {
       ? match.raw_metadata.similarity_threshold
       : 0.70;
     const rawCandidates = match.top_candidates || (match.raw_metadata && match.raw_metadata.top_candidates) || [];
-    const candidates = rawCandidates.filter((cand) => (cand.similarity || 0) >= activeThreshold);
+    currentExtractedCandidates = rawCandidates.filter((cand) => (cand.similarity || 0) >= activeThreshold);
 
-    if (candidates && candidates.length > 0) {
+    if (currentExtractedCandidates && currentExtractedCandidates.length > 0) {
       if (btnToggleCandidates) {
         btnToggleCandidates.classList.remove("hidden");
         btnToggleCandidates.classList.remove("active");
-        if (candidatesCount) candidatesCount.textContent = candidates.length;
+      }
+      if (btnFilterSocial) {
+        btnFilterSocial.classList.remove("hidden");
+        btnFilterSocial.classList.remove("active");
       }
       if (candidatesDrawer) candidatesDrawer.classList.add("hidden");
 
-      if (candidatesGrid) {
-        candidatesGrid.innerHTML = candidates.map((cand) => {
-          const isTopMatch = cand.similarity === match.visual_similarity_score;
-          const simPct = cand.similarity_pct !== undefined ? cand.similarity_pct : ((cand.similarity || 0) * 100).toFixed(1);
-          return `
-            <div class="candidate-card ${isTopMatch ? "is-top" : ""}">
-              <div class="candidate-thumb-wrap">
-                <img src="${cand.image_url}" alt="${cand.title || "Match"}" class="candidate-thumb" loading="lazy" onerror="this.style.display='none'">
-                <span class="candidate-rank-badge">#${cand.rank || 1}</span>
-                <span class="candidate-sim-pill">${simPct}%</span>
-              </div>
-              <div class="candidate-body">
-                <div class="candidate-title" title="${cand.title || ""}">${cand.title || "Web Result"}</div>
-                <div class="candidate-author">${cand.platform || "Web"} • ${cand.author || "-"}</div>
-                ${cand.url ? `<a href="${cand.url}" target="_blank" class="candidate-link"><span>View Source</span> ↗</a>` : ""}
-              </div>
-            </div>
-          `;
-        }).join("");
-      }
+      updateCandidatesDisplay("all");
     } else {
       if (btnToggleCandidates) btnToggleCandidates.classList.add("hidden");
+      if (btnFilterSocial) btnFilterSocial.classList.add("hidden");
       if (candidatesDrawer) candidatesDrawer.classList.add("hidden");
     }
 
     // Stage 3: Blockchain Record
     const att = data.blockchain_attestation || {};
     currentAttestationId = att.id || null;
-    txHashVal.textContent = att.tx_hash || "-";
-    blockNumVal.textContent = att.block_number ? `#${att.block_number}` : "-";
-    contractVal.textContent = att.contract_address || "-";
-    payloadHashVal.textContent = att.payload_hash || "-";
-    networkBadge.textContent = att.network_name || "EVM";
+    if (txHashVal) txHashVal.textContent = att.tx_hash || "-";
+    if (blockNumVal) blockNumVal.textContent = att.block_number ? `#${att.block_number}` : "-";
+    if (contractVal) contractVal.textContent = att.contract_address || "-";
+    if (payloadHashVal) payloadHashVal.textContent = att.payload_hash || "-";
+    if (networkBadge) networkBadge.textContent = att.network_name || "EVM";
 
     // Stage 4: Tamper Verification
     const ver = data.verification || {};
     renderVerificationState(ver.is_valid !== false);
+  }
+
+  // =========================================================================
+  // Extensive Social Media Knowledge Base & Candidate Inspector
+  // =========================================================================
+  const SOCIAL_NETWORKS = [
+    { id: "instagram", name: "Instagram", domains: ["instagram.com", "instagr.am", "cdninstagram.com"] },
+    { id: "linkedin", name: "LinkedIn", domains: ["linkedin.com", "licdn.com"] },
+    { id: "twitter", name: "Twitter/X", domains: ["twitter.com", "x.com", "t.co", "twimg.com"] },
+    { id: "facebook", name: "Facebook", domains: ["facebook.com", "fb.com", "fb.watch", "fbsbx.com"] },
+    { id: "youtube", name: "YouTube", domains: ["youtube.com", "youtu.be", "ytimg.com"] },
+    { id: "tiktok", name: "TikTok", domains: ["tiktok.com", "tiktokcdn.com", "douyin.com"] },
+    { id: "reddit", name: "Reddit", domains: ["reddit.com", "redd.it", "redditmedia.com"] },
+    { id: "pinterest", name: "Pinterest", domains: ["pinterest.com", "pinimg.com"] },
+    { id: "threads", name: "Threads", domains: ["threads.net"] },
+    { id: "snapchat", name: "Snapchat", domains: ["snapchat.com"] },
+    { id: "telegram", name: "Telegram", domains: ["t.me", "telegram.org"] },
+    { id: "whatsapp", name: "WhatsApp", domains: ["whatsapp.com", "wa.me"] },
+    { id: "vk", name: "VK", domains: ["vk.com", "vkontakte.ru"] },
+    { id: "github", name: "GitHub", domains: ["github.com"] },
+    { id: "gitlab", name: "GitLab", domains: ["gitlab.com"] },
+    { id: "medium", name: "Medium", domains: ["medium.com"] },
+    { id: "tumblr", name: "Tumblr", domains: ["tumblr.com"] },
+    { id: "bluesky", name: "Bluesky", domains: ["bsky.app", "bsky.social"] },
+    { id: "mastodon", name: "Mastodon", domains: ["mastodon.social", "mastodon.online", "mstdn.social", "fosstodon.org"] },
+    { id: "discord", name: "Discord", domains: ["discord.com", "discord.gg"] },
+    { id: "twitch", name: "Twitch", domains: ["twitch.tv"] },
+    { id: "quora", name: "Quora", domains: ["quora.com"] },
+    { id: "wechat", name: "WeChat", domains: ["wechat.com", "weixin.qq.com"] },
+    { id: "weibo", name: "Weibo", domains: ["weibo.com", "weibo.cn"] },
+    { id: "xiaohongshu", name: "Xiaohongshu", domains: ["xiaohongshu.com"] },
+    { id: "bilibili", name: "Bilibili", domains: ["bilibili.com"] },
+    { id: "doximity", name: "Doximity", domains: ["doximity.com"] },
+    { id: "researchgate", name: "ResearchGate", domains: ["researchgate.net"] },
+    { id: "orcid", name: "ORCID", domains: ["orcid.org"] },
+    { id: "substack", name: "Substack", domains: ["substack.com"] },
+    { id: "patreon", name: "Patreon", domains: ["patreon.com"] },
+    { id: "soundcloud", name: "SoundCloud", domains: ["soundcloud.com"] },
+    { id: "spotify", name: "Spotify", domains: ["spotify.com"] },
+    { id: "flickr", name: "Flickr", domains: ["flickr.com"] },
+    { id: "vimeo", name: "Vimeo", domains: ["vimeo.com"] }
+  ];
+
+  function isSocialCandidate(cand) {
+    if (!cand) return false;
+    const platform = (cand.platform || "").toLowerCase();
+    const url = (cand.url || "").toLowerCase();
+    const author = (cand.author || "").toLowerCase();
+    const title = (cand.title || "").toLowerCase();
+
+    for (const net of SOCIAL_NETWORKS) {
+      if (platform.includes(net.id) || platform.includes(net.name.toLowerCase())) return true;
+      for (const d of net.domains) {
+        if (url.includes(d)) return true;
+      }
+    }
+    return false;
+  }
+
+  function getCandidatePlatform(cand) {
+    if (!cand) return "Web";
+    const platform = (cand.platform || "").toLowerCase();
+    const url = (cand.url || "").toLowerCase();
+    for (const net of SOCIAL_NETWORKS) {
+      if (platform.includes(net.id) || platform.includes(net.name.toLowerCase())) return net.name;
+      for (const d of net.domains) {
+        if (url.includes(d)) return net.name;
+      }
+    }
+    return cand.platform && cand.platform !== "Web" ? cand.platform : "Web";
+  }
+
+  function updateCandidatesDisplay(filterMode = "all", targetPlatform = null) {
+    currentFilterMode = filterMode;
+
+    const socialCandidates = currentExtractedCandidates.filter(isSocialCandidate);
+
+    // Update numerical counters
+    if (candidatesCount) candidatesCount.textContent = currentExtractedCandidates.length;
+    if (socialCandidatesCount) socialCandidatesCount.textContent = socialCandidates.length;
+    if (countTabAll) countTabAll.textContent = currentExtractedCandidates.length;
+    if (countTabSocial) countTabSocial.textContent = socialCandidates.length;
+
+    // Filter button and tab active toggles
+    if (filterTabAll) filterTabAll.classList.toggle("active", filterMode === "all");
+    if (filterTabSocial) filterTabSocial.classList.toggle("active", filterMode === "social" || targetPlatform !== null);
+    if (btnFilterSocial) btnFilterSocial.classList.toggle("active", filterMode === "social" || targetPlatform !== null);
+
+    // Filter dataset
+    let filteredList = currentExtractedCandidates;
+    if (filterMode === "social") {
+      filteredList = socialCandidates;
+      if (targetPlatform) {
+        filteredList = filteredList.filter((c) => getCandidatePlatform(c) === targetPlatform);
+      }
+      if (drawerTitle) {
+        drawerTitle.textContent = targetPlatform
+          ? `${targetPlatform} Profiles (${filteredList.length})`
+          : `Social Media Matches (${filteredList.length})`;
+      }
+      if (drawerSubtitle) drawerSubtitle.textContent = "Filtered to public social media platforms";
+    } else {
+      if (drawerTitle) drawerTitle.textContent = `All Web Matches (${filteredList.length})`;
+      if (drawerSubtitle) drawerSubtitle.textContent = "Candidates discovered via Google Lens & Yandex";
+    }
+
+    // Render Sub-platform Filter Pills when in Social mode
+    if (socialPlatformFilterRow) {
+      if ((filterMode === "social" || targetPlatform) && socialCandidates.length > 0) {
+        const platformCounts = {};
+        socialCandidates.forEach((c) => {
+          const p = getCandidatePlatform(c);
+          platformCounts[p] = (platformCounts[p] || 0) + 1;
+        });
+
+        const platforms = Object.keys(platformCounts);
+        if (platforms.length > 1) {
+          socialPlatformFilterRow.classList.remove("hidden");
+          socialPlatformFilterRow.innerHTML = `
+            <button type="button" class="platform-filter-pill ${!targetPlatform ? "active" : ""}" data-platform="">
+              All Social (${socialCandidates.length})
+            </button>
+            ${platforms.map((p) => `
+              <button type="button" class="platform-filter-pill ${targetPlatform === p ? "active" : ""}" data-platform="${p}">
+                ${p} (${platformCounts[p]})
+              </button>
+            `).join("")}
+          `;
+
+          socialPlatformFilterRow.querySelectorAll(".platform-filter-pill").forEach((pill) => {
+            pill.addEventListener("click", () => {
+              const selectedP = pill.getAttribute("data-platform");
+              updateCandidatesDisplay("social", selectedP || null);
+            });
+          });
+        } else {
+          socialPlatformFilterRow.classList.add("hidden");
+        }
+      } else {
+        socialPlatformFilterRow.classList.add("hidden");
+      }
+    }
+
+    // Render Grid
+    if (candidatesGrid) {
+      if (filteredList.length === 0) {
+        candidatesGrid.innerHTML = `
+          <div class="empty-candidates-notice">
+            No ${filterMode === "social" ? "social media" : ""} candidates found matching this selection.
+          </div>
+        `;
+        return;
+      }
+
+      candidatesGrid.innerHTML = filteredList.map((cand, idx) => {
+        const isSocial = isSocialCandidate(cand);
+        const platformName = getCandidatePlatform(cand);
+        const simPct = cand.similarity_pct !== undefined ? cand.similarity_pct : ((cand.similarity || 0) * 100).toFixed(1);
+        const isCurrentlyActive = cand.url && postUrlLink && postUrlLink.href === cand.url;
+
+        return `
+          <div class="candidate-card ${isCurrentlyActive ? "is-top" : ""} ${isSocial ? "is-social" : ""}" data-cand-url="${cand.url || ""}">
+            <div class="candidate-thumb-wrap">
+              <img src="${cand.image_url}" alt="${cand.title || "Match"}" class="candidate-thumb" loading="lazy" onerror="this.style.display='none'">
+              <span class="candidate-rank-badge">#${cand.rank || idx + 1}</span>
+              <span class="candidate-sim-pill">${simPct}%</span>
+              <span class="candidate-platform-badge">${platformName}</span>
+            </div>
+            <div class="candidate-body">
+              <div class="candidate-title" title="${cand.title || ""}">${cand.title || "Web Result"}</div>
+              <div class="candidate-author">${platformName} • ${cand.author || "-"}</div>
+              <div class="candidate-actions-row">
+                <button type="button" class="candidate-inspect-btn">Inspect</button>
+                ${cand.url ? `<a href="${cand.url}" target="_blank" class="candidate-link"><span>Open</span> ↗</a>` : ""}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      // Interactive Card Selection to Inspect Profile Live
+      candidatesGrid.querySelectorAll(".candidate-card").forEach((card, idx) => {
+        const cand = filteredList[idx];
+        card.addEventListener("click", (e) => {
+          if (e.target.closest(".candidate-link")) return;
+          inspectCandidate(cand);
+        });
+      });
+    }
+  }
+
+  function inspectCandidate(cand) {
+    if (!cand) return;
+    const platformName = getCandidatePlatform(cand);
+
+    if (authorName) authorName.textContent = cand.author || cand.title || "Match";
+    if (authorHandle) authorHandle.textContent = "@" + (cand.author || "user").toLowerCase().replace(/[^a-z0-9_]/g, "_").slice(0, 24);
+    if (matchPlatformBadge) matchPlatformBadge.textContent = platformName;
+
+    const simPct = cand.similarity_pct !== undefined ? cand.similarity_pct : ((cand.similarity || 0) * 100).toFixed(1);
+    if (similarityScore) similarityScore.textContent = `${simPct}%`;
+
+    const simPill = document.querySelector(".sim-pill, .sim-pill-3d");
+    if (simPill) simPill.classList.remove("unmatched");
+
+    if (postCaption) postCaption.textContent = cand.snippet || cand.title || "Extracted visual match";
+
+    if (postUrlLink) {
+      if (cand.url) {
+        postUrlLink.href = cand.url;
+        postUrlLink.classList.remove("hidden");
+      } else {
+        postUrlLink.classList.add("hidden");
+      }
+    }
+
+    if (cand.image_url) {
+      if (matchAvatarImg) {
+        matchAvatarImg.src = cand.image_url;
+        matchAvatarImg.classList.remove("hidden");
+      }
+      if (matchAvatarPlaceholder) matchAvatarPlaceholder.classList.add("hidden");
+
+      if (matchImagePreviewContainer && matchPreviewImg) {
+        matchPreviewImg.src = cand.image_url;
+        if (previewUrlLink) previewUrlLink.href = cand.url || "#";
+        if (matchPreviewTag) matchPreviewTag.textContent = `${platformName} Match`;
+        matchImagePreviewContainer.classList.remove("hidden");
+      }
+    }
+
+    if (candidatesGrid) {
+      candidatesGrid.querySelectorAll(".candidate-card").forEach((c) => {
+        c.classList.remove("is-top");
+      });
+      const matchingCard = Array.from(candidatesGrid.querySelectorAll(".candidate-card")).find(
+        (c) => c.getAttribute("data-cand-url") === cand.url
+      );
+      if (matchingCard) matchingCard.classList.add("is-top");
+    }
   }
 
   function renderVerificationState(isValid) {
@@ -803,13 +851,52 @@ function initAppLogic() {
     }
   }
 
+  // // Automatically restore latest scan on page load/refresh so extracted data & filter buttons remain visible
+  // async function autoRestoreLatestRun() {
+  //   try {
+  //     const res = await fetch("/api/pipeline/history?limit=1");
+  //     if (!res.ok) return;
+  //     const data = await res.json();
+  //     if (Array.isArray(data) && data.length > 0 && !currentFile) {
+  //       const item = data[0];
+  //       const resultPayload = {
+  //         face_scan: item.scan || {},
+  //         search_match: item.search_match || {},
+  //         blockchain_attestation: item.attestation || {},
+  //         verification: item.latest_audit ? {
+  //           is_valid: item.latest_audit.is_valid,
+  //           tampered_fields: (item.latest_audit.tamper_details && item.latest_audit.tamper_details.tampered_fields) || []
+  //         } : { is_valid: true }
+  //       };
+
+  //       if (item.scan && item.scan.crop_image_path) {
+  //         const cropFilename = item.scan.crop_image_path.split("/").pop();
+  //         if (imagePreview) imagePreview.src = `/data-files/crops/${cropFilename}`;
+  //         if (dropzone) dropzone.classList.add("has-preview");
+  //         if (dropzoneContent) dropzoneContent.classList.add("hidden");
+  //         if (previewContainer) previewContainer.classList.remove("hidden");
+  //       }
+
+  //       renderResults(resultPayload);
+  //       setStepCompleted(1);
+  //       setStepCompleted(2);
+  //       setStepCompleted(3);
+  //       setStepCompleted(4);
+  //     }
+  //   } catch (e) {
+  //     console.debug("Could not auto-restore last run:", e);
+  //   }
+  // }
+
+  // autoRestoreLatestRun();
+
   // Stepper Management Utilities
   function setStepActive(n, msg) {
     const rows = [pStep1, pStep2, pStep3, pStep4];
     const descs = [pStep1Desc, pStep2Desc, pStep3Desc, pStep4Desc];
     const row = rows[n - 1];
     if (!row) return;
-    row.className = "step-3d-row active";
+    row.className = "step-row step-3d-row active";
     if (msg && descs[n - 1]) descs[n - 1].textContent = msg;
   }
 
@@ -826,7 +913,7 @@ function initAppLogic() {
     ];
     const row = rows[n - 1];
     if (!row) return;
-    row.className = "step-3d-row completed";
+    row.className = "step-row step-3d-row completed";
     if (orbs[n - 1]) orbs[n - 1].innerHTML = "✓";
     if (descs[n - 1]) descs[n - 1].textContent = defaultLabels[n - 1];
     if (n - 1 < conns.length && conns[n - 1]) {
@@ -846,7 +933,7 @@ function initAppLogic() {
       "Verify record integrity",
     ];
     rows.forEach((r, i) => {
-      if (r) r.className = "step-3d-row";
+      if (r) r.className = "step-row step-3d-row";
       if (orbs[i]) orbs[i].textContent = String(i + 1);
       if (descs[i]) descs[i].textContent = defaultLabels[i];
     });

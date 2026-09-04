@@ -56,28 +56,66 @@ graph TD
 
 6. **Dual User Interface**:
    - **Rich Interactive CLI**: Animated terminal interface with tables, progress spinners, and verification panels (`python -m src.cli run <image>`).
-   - **Sleek Web Dashboard**: Dark-mode visual UI (`http://localhost:8000`) with drag-and-drop uploads, step-by-step animations, and a 1-click **Tamper Simulation** test for screen recordings.
+   - **Sleek Web Dashboard**: Dark-mode visual UI (`http://localhost:8090`) with drag-and-drop uploads, step-by-step animations, and a 1-click **Tamper Simulation** test for screen recordings.
+
+---
+
+## ⚙️ Environment Configuration (`.env`)
+
+Create your local `.env` file by copying the template:
+```bash
+cp .env.example .env
+```
+
+### Key Environment Variables
+
+| Variable | Purpose | Required? | Default / Notes |
+| :--- | :--- | :--- | :--- |
+| `SERPAPI_API_KEY` | Powers live **Google Lens** & **Yandex** visual searches for social profiles. | Recommended | Optional (smoothly falls back to realistic fixtures) |
+| `GOOGLE_VISION_API_KEY` | Google Cloud Vision Web Detection for image entity matching. | Optional | Empty |
+| `SIMILARITY_THRESHOLD` | ArcFace cosine similarity cutoff for face matches (0.0 to 1.0). | Optional | `0.70` (use `0.50`–`0.60` for compressed web thumbnails) |
+| `DATABASE_URL` | PostgreSQL connection string with `pgvector` support. | Required | `postgresql://postgres:postgrespassword@db:5432/face_verification_db` |
+| `BLOCKCHAIN_RPC_URL` | EVM RPC endpoint (Sepolia, Polygon Amoy, or local Anvil). | Optional | Blank (uses built-in EVM Simulator) |
+| `BLOCKCHAIN_PRIVATE_KEY` | Wallet private key for signing on-chain transactions. | Optional | Auto-generated in local simulator |
+| `INSIGHTFACE_MODEL_NAME` | Biometric embedding model (`buffalo_l` or `buffalo_sc`). | Optional | `buffalo_l` (high accuracy) |
+
+---
+
+### 🔑 How to Get a SerpApi Key (`SERPAPI_API_KEY`)
+
+[SerpApi](https://serpapi.com) allows the pipeline to query Google Lens and Yandex Reverse Image Search in real time without getting blocked by anti-bot protections:
+
+1. **Sign Up**: Head to [serpapi.com](https://serpapi.com) and register for a free account.
+2. **Copy Key**: Navigate to your [SerpApi Dashboard](https://serpapi.com/manage-api-key) and copy your **Private API Key** (the free tier includes **100 searches/month** with no credit card required).
+3. **Paste in `.env`**:
+   ```bash
+   SERPAPI_API_KEY=your_serpapi_key_here
+   ```
+
+> [!TIP]
+> **No API Key? No Problem.** If `SERPAPI_API_KEY` is not provided, the pipeline automatically activates its built-in realistic fixture provider and open-web search. You can test the entire pipeline (detection, embedding, blockchain attestation, and tamper verification) completely offline!
 
 ---
 
 ## 🚀 Quick Start with Docker (Recommended)
 
-### 1. Clone the Repository
+### 1. Clone the Repository & Configure `.env`
 ```bash
 git clone <YOUR_REPO_URL>
 cd hhgoa-3
+cp .env.example .env
 ```
 
 ### 2. Start Services with Docker Compose
 ```bash
 docker compose up --build -d
 ```
-*This starts:*
-- `db`: PostgreSQL 16 with `pgvector` extension (Volume mounted to `pgdata`).
-- `app`: FastAPI web server and pipeline service on `http://localhost:8000` (Volumes mounted to `./data` and `./models`).
+*This spins up:*
+- `db`: PostgreSQL 16 with `pgvector` extension on port `5432`.
+- `app`: FastAPI web server & pipeline on `http://localhost:8090` (internal `8000`).
 
 ### 3. Open the Web Dashboard
-Navigate to **`http://localhost:8000`** in your browser:
+Navigate to **`http://localhost:8090`** (or `http://localhost:8000` if running locally without Docker) in your browser:
 - Upload any face photo or click one of the pre-loaded test profiles.
 - Click **"Execute End-to-End Pipeline"** to watch the 4-step process live.
 - Click **"⚡ Simulate Malicious Data Alteration"** to demonstrate blockchain tamper-evidence live on screen!
@@ -189,11 +227,3 @@ hhgoa-3/
 3. **Gas Cost Optimization**: For high-volume mainnet anchoring, multi-attestation Merkle tree batching (e.g. anchoring 1,000 face discoveries per root hash transaction) can be implemented.
 
 ---
-
-## 🎥 Screen Recording Submission Guide
-
-For your submission video:
-1. Open the Web UI on `http://localhost:8000` (or open terminal with `python -m src.cli run`).
-2. Select a face scan and click **"Execute End-to-End Pipeline"**.
-3. Highlight the 4 stages: Face Detection $\to$ Discovered Social Post $\to$ Blockchain Attestation $\to$ Verified On-Chain.
-4. Click **"⚡ Simulate Malicious Data Alteration"** to demonstrate how the blockchain detects tampering and prevents fraud.

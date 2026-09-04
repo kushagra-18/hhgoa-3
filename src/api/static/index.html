@@ -8,164 +8,39 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
-  <!-- Three.js 3D Engine -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  
-  <link rel="stylesheet" href="/static/style.css?v=20260904_12">
-  <style>
-    /* View Tabs Styling */
-    .tabs-nav-wrap {
-      display: flex;
-      justify-content: center;
-      width: 100%;
-      margin: 0 auto 24px;
-    }
-    .view-tabs {
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      gap: 6px !important;
-      background: rgba(15, 23, 42, 0.85) !important;
-      padding: 6px !important;
-      border-radius: 40px !important;
-      border: 1px solid rgba(56, 189, 248, 0.25) !important;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
-      backdrop-filter: blur(14px) !important;
-      -webkit-backdrop-filter: blur(14px) !important;
-    }
-    .view-tab-btn {
-      display: inline-flex !important;
-      align-items: center !important;
-      gap: 8px !important;
-      padding: 10px 22px !important;
-      background: transparent !important;
-      border: none !important;
-      outline: none !important;
-      border-radius: 30px !important;
-      color: #94a3b8 !important;
-      font-family: 'Plus Jakarta Sans', sans-serif !important;
-      font-size: 13px !important;
-      font-weight: 600 !important;
-      cursor: pointer !important;
-      transition: all 0.25s ease !important;
-      user-select: none !important;
-    }
-    .view-tab-btn:hover {
-      color: #f8fafc !important;
-      background: rgba(255, 255, 255, 0.08) !important;
-    }
-    .view-tab-btn.active {
-      color: #ffffff !important;
-      background: linear-gradient(135deg, rgba(14, 165, 233, 0.35) 0%, rgba(99, 102, 241, 0.4) 100%) !important;
-      border: 1px solid rgba(56, 189, 248, 0.5) !important;
-      box-shadow: 0 0 16px rgba(14, 165, 233, 0.3) !important;
-    }
-    .view-tab-btn.active svg {
-      color: #38bdf8 !important;
-    }
-    .tab-badge {
-      background: rgba(255, 255, 255, 0.15) !important;
-      color: #e2e8f0 !important;
-      font-size: 11px !important;
-      font-weight: 700 !important;
-      padding: 2px 8px !important;
-      border-radius: 12px !important;
-      margin-left: 2px !important;
-    }
-    .view-tab-btn.active .tab-badge {
-      background: rgba(14, 165, 233, 0.5) !important;
-      color: #ffffff !important;
-    /* Natural Aspect-Ratio Image Container */
-    .holo-dropzone {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 200px;
-      transition: all 0.3s ease;
-    }
-    .holo-dropzone.has-preview {
-      padding: 0;
-      border-style: solid;
-      border-color: rgba(56, 189, 248, 0.5);
-      background: #020617;
-    }
-    .holo-preview-wrapper {
-      position: relative;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #030712;
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    .holo-preview-img {
-      width: 100%;
-      height: auto;
-      max-height: 520px;
-      object-fit: contain;
-      display: block;
-      margin: 0 auto;
-    }
-    .hidden {
-      display: none !important;
-    }
-  </style>
+  <link rel="stylesheet" href="/static/style.css?v=20260904_18">
 </head>
-<body class="dark-cyber-theme">
-  <!-- Interactive 3D WebGL Canvas Layer -->
-  <canvas id="webglCanvas" class="webgl-canvas"></canvas>
-  <div class="ambient-vignette"></div>
-
+<body class="clean-dark-theme">
   <div class="app-layout">
-    <!-- Frosted Glass Header -->
-    <header class="glass-navbar">
+    <!-- Clean Minimal Header -->
+    <header class="navbar">
       <div class="nav-content">
         <div class="brand-group">
-          <div class="brand-3d-cube" id="navBrandCube">
-            <div class="cube-inner">
-              <div class="cube-face cube-front"></div>
-              <div class="cube-face cube-back"></div>
-              <div class="cube-face cube-right"></div>
-              <div class="cube-face cube-left"></div>
-              <div class="cube-face cube-top"></div>
-              <div class="cube-face cube-bottom"></div>
-            </div>
+          <div class="brand-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <circle cx="12" cy="11" r="3"/>
+              <path d="M7 18.5a5 5 0 0 1 10 0"/>
+            </svg>
           </div>
           <div class="brand-meta">
-            <div class="brand-title">Face Verification<span class="glow-accent">Pipeline</span></div>
+            <div class="brand-title">Face Verification Pipeline</div>
             <div class="brand-subtitle">Biometric Identity & Blockchain Attestation</div>
           </div>
         </div>
 
-        <div class="nav-telemetry">
-          <div class="telemetry-node">
-            <span class="node-label">Status: <strong class="text-glow-green">Ready</strong></span>
-          </div>
-          <div class="telemetry-divider"></div>
-          <div class="chain-badge-3d">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="margin-right: 4px;">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-            </svg>
-            <span>EVM Blockchain</span>
-          </div>
-        </div>
       </div>
     </header>
 
     <!-- Main Workspace -->
     <main class="workspace-container">
       <!-- Hero Section -->
-      <section class="hero-3d">
-        <h1 class="hero-heading">
-          Face Verification
-          <span class="heading-gradient">& Tamper Detection</span>
-        </h1>
+      <section class="hero-section">
+        <h1 class="hero-heading">Face Verification & Tamper Detection</h1>
         <p class="hero-description">
-          Upload a face photo to detect matching online profiles, anchor an attestation to the blockchain, and verify record integrity.
+          Upload a face photo to detect matching online profiles, anchor an immutable attestation to the blockchain, and verify record integrity.
         </p>
       </section>
 
@@ -173,13 +48,13 @@
       <div class="tabs-nav-wrap">
         <nav class="view-tabs" role="tablist">
           <button type="button" class="view-tab-btn active" id="tabBtnPipeline" data-tab="pipeline">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
             </svg>
             <span>Verification Pipeline</span>
           </button>
           <button type="button" class="view-tab-btn" id="tabBtnHistory" data-tab="history">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
               <polyline points="14 2 14 8 20 8"/>
               <line x1="16" y1="13" x2="8" y2="13"/>
@@ -193,339 +68,345 @@
 
       <!-- Tab Panel 1: Verification Pipeline -->
       <div id="tabContentPipeline" class="tab-content-panel active">
-        <!-- Interactive Layout -->
         <div class="terminal-stage">
-        <!-- Left Panel: Photo Input -->
-        <div class="card-3d input-card-3d">
-          <div class="card-glow-layer"></div>
-          <div class="card-3d-header">
-            <div class="stage-indicator">
-              <span class="stage-num">1</span>
-              <div>
-                <h3>Input Photo</h3>
-                <span class="stage-desc">Upload or select an image to scan</span>
+          <!-- Left Panel: Photo Input -->
+          <div class="card-box input-card">
+            <div class="card-box-header">
+              <div class="stage-indicator">
+                <span class="stage-num">1</span>
+                <div>
+                  <h3>Input Photo</h3>
+                  <span class="stage-desc">Upload or select an image to scan</span>
+                </div>
+              </div>
+              <div class="status-chip">READY</div>
+            </div>
+
+            <!-- Dropzone -->
+            <div class="dropzone" id="dropzone">
+              <input type="file" id="fileInput" accept="image/*" class="file-input-hidden">
+              
+              <div class="dropzone-content" id="dropzoneContent">
+                <div class="dropzone-icon">
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                </div>
+                <h4>Upload a photo to scan</h4>
+                <p>Drag and drop, or click to browse (JPG, PNG, WEBP)</p>
+              </div>
+
+              <!-- Subject Preview -->
+              <div class="preview-wrapper hidden" id="previewContainer">
+                <img id="imagePreview" alt="" class="preview-img">
+                <div class="face-target-box" id="faceTargetBox"></div>
+                <div class="laser-scanner hidden" id="laserScanner"></div>
+                <button type="button" class="btn-change-photo" id="btnChange">Change Photo</button>
               </div>
             </div>
-            <div class="status-chip">READY</div>
+
+            <!-- Primary CTA Button with Progress Line -->
+            <button id="btnRunPipeline" class="btn-cta" disabled>
+              <span class="btn-content">
+                <span class="btn-spinner hidden" id="btnSpinner"></span>
+                <span class="btn-text" id="btnText">Run Verification</span>
+                <span class="btn-pct-badge hidden" id="btnPctBadge">0%</span>
+              </span>
+              <div class="btn-progress-line" id="btnProgressLine"></div>
+            </button>
+
+            <!-- Pipeline Progression Stepper -->
+            <div class="stepper" id="pipelineProgress">
+              <div class="step-row" id="pStep1">
+                <div class="step-orb" id="pStep1Orb">1</div>
+                <div class="step-details">
+                  <strong>Face Detection</strong>
+                  <span id="pStep1Desc">Detect face and extract features</span>
+                </div>
+              </div>
+              <div class="step-connector" id="pConn1"></div>
+              <div class="step-row" id="pStep2">
+                <div class="step-orb" id="pStep2Orb">2</div>
+                <div class="step-details">
+                  <strong>Web Match</strong>
+                  <span id="pStep2Desc">Search public profiles and posts</span>
+                </div>
+              </div>
+              <div class="step-connector" id="pConn2"></div>
+              <div class="step-row" id="pStep3">
+                <div class="step-orb" id="pStep3Orb">3</div>
+                <div class="step-details">
+                  <strong>Blockchain Record</strong>
+                  <span id="pStep3Desc">Anchor attestation on-chain</span>
+                </div>
+              </div>
+              <div class="step-connector" id="pConn3"></div>
+              <div class="step-row" id="pStep4">
+                <div class="step-orb" id="pStep4Orb">4</div>
+                <div class="step-details">
+                  <strong>Tamper Check</strong>
+                  <span id="pStep4Desc">Verify record integrity</span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <!-- Dropzone -->
-          <div class="holo-dropzone" id="dropzone">
-            <input type="file" id="fileInput" accept="image/*" class="file-input-hidden">
-            
-            <div class="holo-dropzone-content" id="dropzoneContent">
-              <div class="holo-scan-target">
-                <div class="corner-bracket top-left"></div>
-                <div class="corner-bracket top-right"></div>
-                <div class="corner-bracket bottom-left"></div>
-                <div class="corner-bracket bottom-right"></div>
-                <div class="radar-sweep"></div>
-                
-                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                  <polyline points="17 8 12 3 7 8"/>
-                  <line x1="12" y1="3" x2="12" y2="15"/>
+          <!-- Right Output Stack -->
+          <div class="results-stage">
+            <!-- Empty State Container -->
+            <div id="emptyState" class="empty-card">
+              <div class="empty-icon-wrap">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
                 </svg>
               </div>
-              <h4>Upload a photo to scan</h4>
-              <p>Drag and drop, or click to browse (JPG, PNG, WEBP)</p>
+              <h3>Ready to Scan</h3>
+              <p>Upload a photo on the left to run facial verification, reverse profile matching, and blockchain attestation.</p>
             </div>
 
-            <!-- Subject Preview with Scanning Overlay -->
-            <div class="holo-preview-wrapper hidden" id="previewContainer">
-              <img id="imagePreview" alt="" class="holo-preview-img">
-              <div class="laser-scanner" id="laserScanner"></div>
-              <div class="face-target-box" id="faceTargetBox"></div>
-              <button type="button" class="btn-holo-change" id="btnChange">Change Photo</button>
-            </div>
-          </div>
-
-          <!-- Primary CTA Button with Built-In Progress Line -->
-          <button id="btnRunPipeline" class="btn-3d-cta" disabled>
-            <span class="btn-glare"></span>
-            <span class="btn-content">
-              <span class="btn-spinner-3d hidden" id="btnSpinner"></span>
-              <span class="btn-text" id="btnText">Run Verification</span>
-              <span class="btn-pct-badge hidden" id="btnPctBadge">0%</span>
-            </span>
-            <div class="btn-progress-line" id="btnProgressLine"></div>
-          </button>
-
-          <!-- Pipeline Progression Stepper -->
-          <div class="stepper-3d" id="pipelineProgress">
-            <div class="step-3d-row" id="pStep1">
-              <div class="step-orb" id="pStep1Orb">1</div>
-              <div class="step-details">
-                <strong>Face Detection</strong>
-                <span id="pStep1Desc">Detect face and extract features</span>
-              </div>
-            </div>
-            <div class="step-3d-connector" id="pConn1"></div>
-            <div class="step-3d-row" id="pStep2">
-              <div class="step-orb" id="pStep2Orb">2</div>
-              <div class="step-details">
-                <strong>Web Match</strong>
-                <span id="pStep2Desc">Search public profiles and posts</span>
-              </div>
-            </div>
-            <div class="step-3d-connector" id="pConn2"></div>
-            <div class="step-3d-row" id="pStep3">
-              <div class="step-orb" id="pStep3Orb">3</div>
-              <div class="step-details">
-                <strong>Blockchain Record</strong>
-                <span id="pStep3Desc">Anchor attestation on-chain</span>
-              </div>
-            </div>
-            <div class="step-3d-connector" id="pConn3"></div>
-            <div class="step-3d-row" id="pStep4">
-              <div class="step-orb" id="pStep4Orb">4</div>
-              <div class="step-details">
-                <strong>Tamper Check</strong>
-                <span id="pStep4Desc">Verify record integrity</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right Output Stack -->
-        <div class="results-3d-stage">
-          <!-- Empty State Container -->
-          <div id="emptyState" class="empty-3d-card">
-            <div class="empty-3d-orb">
-              <div class="hologram-shield">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                  <path d="M9 12l2 2 4-4"/>
-                </svg>
-              </div>
-            </div>
-            <h3>Ready to Scan</h3>
-            <p>Upload a photo or select a sample on the left to run the verification pipeline.</p>
-          </div>
-
-          <!-- Dynamic Results Container -->
-          <div id="resultsContainer" class="results-3d-stack hidden">
-            <!-- Stage 1: Face Detection Card -->
-            <div class="card-3d">
-              <div class="card-glow-layer"></div>
-              <div class="card-3d-header">
-                <div class="stage-indicator">
-                  <span class="stage-num">1</span>
-                  <div>
-                    <h3>Face Detection</h3>
-                    <span class="stage-desc">Detected face & features</span>
-                  </div>
-                </div>
-                <div class="badge-3d badge-green" id="faceConfidenceBadge">-</div>
-              </div>
-
-              <div class="biometric-3d-grid">
-                <div class="crop-3d-box">
-                  <div class="crop-hologram-frame">
-                    <img id="faceCropImg" src="" alt="Aligned Crop">
-                    <div class="crop-scanlines"></div>
-                  </div>
-                  <span class="crop-tag">Face Crop</span>
-                </div>
-                
-                <div class="meta-3d-list">
-                  <div class="meta-3d-item">
-                    <span class="meta-3d-key">Bounding Box</span>
-                    <span class="meta-3d-val mono" id="faceBboxVal">-</span>
-                  </div>
-                  <div class="meta-3d-item">
-                    <span class="meta-3d-key">Image SHA-256</span>
-                    <span class="meta-3d-val mono truncate" id="faceShaVal">-</span>
-                  </div>
-                  <div class="meta-3d-item">
-                    <span class="meta-3d-key">Embedding</span>
-                    <span class="meta-3d-val text-glow-green">512-D Normalized Vector</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Stage 2: Web Match Card -->
-            <div class="card-3d">
-              <div class="card-glow-layer"></div>
-              <div class="card-3d-header">
-                <div class="stage-indicator">
-                  <span class="stage-num">2</span>
-                  <div>
-                    <h3>Web Match</h3>
-                    <span class="stage-desc">Matching public profile or post</span>
-                  </div>
-                </div>
-                <div class="badge-3d badge-cyan" id="matchPlatformBadge">-</div>
-              </div>
-
-              <div class="media-3d-body">
-                <div class="media-profile-header">
-                  <div class="media-avatar-3d" id="authorAvatar">
-                    <img id="matchAvatarImg" class="media-avatar-img hidden" alt="Match Profile">
-                    <div id="matchAvatarPlaceholder" class="media-avatar-placeholder">
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
-                      </svg>
+            <!-- Dynamic Results Container -->
+            <div id="resultsContainer" class="results-stack hidden">
+              <!-- Stage 1: Face Detection Card -->
+              <div class="card-box">
+                <div class="card-box-header">
+                  <div class="stage-indicator">
+                    <span class="stage-num">1</span>
+                    <div>
+                      <h3>Face Detection</h3>
+                      <span class="stage-desc">Detected face & features</span>
                     </div>
                   </div>
-                  <div class="media-profile-info">
-                    <h4 id="authorName">-</h4>
-                    <span class="mono" id="authorHandle">-</span>
-                  </div>
-                  <div class="sim-pill-3d">
-                    <span class="sim-sub">SIMILARITY</span>
-                    <span class="sim-val" id="similarityScore">-</span>
-                  </div>
+                  <div class="badge badge-green" id="faceConfidenceBadge">-</div>
                 </div>
 
-                <!-- Discovered Match Image Preview -->
-                <div id="matchImagePreviewContainer" class="match-image-preview hidden">
-                  <img id="matchPreviewImg" class="match-preview-img" alt="Discovered Face">
-                  <div class="match-preview-overlay">
-                    <span class="match-preview-tag" id="matchPreviewTag">Discovered Web Image</span>
-                    <a href="#" target="_blank" id="previewUrlLink" class="preview-external-link">View Full Post ↗</a>
+                <div class="biometric-grid">
+                  <div class="crop-box">
+                    <div class="crop-frame">
+                      <img id="faceCropImg" src="" alt="Aligned Crop">
+                    </div>
+                    <span class="crop-tag">Face Crop</span>
                   </div>
-                </div>
-
-                <p class="media-snippet" id="postCaption">-</p>
-
-                <div class="media-footer-3d">
-                  <div class="media-actions-left">
-                    <a href="#" target="_blank" id="postUrlLink" class="btn-link-3d hidden">
-                      <span>View Source</span>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                        <polyline points="15 3 21 3 21 9"/>
-                        <line x1="10" y1="14" x2="21" y2="3"/>
-                      </svg>
-                    </a>
-                    <button type="button" id="btnToggleCandidates" class="btn-toggle-candidates hidden">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="14" width="7" height="7"></rect>
-                        <rect x="3" y="14" width="7" height="7"></rect>
-                      </svg>
-                      <span>Show All Matches (<span id="candidatesCount">0</span>)</span>
-                      <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                      </svg>
-                    </button>
+                  
+                  <div class="meta-list">
+                    <div class="meta-item">
+                      <span class="meta-key">Bounding Box</span>
+                      <span class="meta-val mono" id="faceBboxVal">-</span>
+                    </div>
+                    <div class="meta-item">
+                      <span class="meta-key">Image SHA-256</span>
+                      <span class="meta-val mono truncate" id="faceShaVal">-</span>
+                    </div>
+                    <div class="meta-item">
+                      <span class="meta-key">Embedding</span>
+                      <span class="meta-val text-green">512-D Normalized Vector</span>
+                    </div>
                   </div>
-                  <span class="mono text-muted" id="postTimestamp"></span>
-                </div>
-
-                <!-- Expandable Drawer for Top K Candidates -->
-                <div id="candidatesDrawer" class="candidates-drawer hidden">
-                  <div class="candidates-drawer-header">
-                    <span class="drawer-title">Top Reverse Search Candidates</span>
-                    <span class="drawer-subtitle">Ranked by facial similarity</span>
-                  </div>
-                  <div class="candidates-grid" id="candidatesGrid"></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Stage 3: Blockchain Attestation Card -->
-            <div class="card-3d">
-              <div class="card-glow-layer"></div>
-              <div class="card-3d-header">
-                <div class="stage-indicator">
-                  <span class="stage-num">3</span>
-                  <div>
-                    <h3>Blockchain Record</h3>
-                    <span class="stage-desc">Attestation stored on smart contract</span>
-                  </div>
-                </div>
-                <div class="badge-3d badge-purple" id="networkBadge">EVM</div>
-              </div>
-
-              <div class="blockchain-3d-matrix">
-                <div class="matrix-cell">
-                  <span class="cell-label">Transaction Hash</span>
-                  <span class="cell-data mono truncate" id="txHashVal">-</span>
-                </div>
-                <div class="matrix-cell">
-                  <span class="cell-label">Block Number</span>
-                  <span class="cell-data mono text-glow-purple" id="blockNumVal">-</span>
-                </div>
-                <div class="matrix-cell">
-                  <span class="cell-label">Contract Address</span>
-                  <span class="cell-data mono truncate" id="contractVal">-</span>
-                </div>
-                <div class="matrix-cell">
-                  <span class="cell-label">Payload Hash</span>
-                  <span class="cell-data mono truncate" id="payloadHashVal">-</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Stage 4: Tamper Verification Card -->
-            <div class="card-3d audit-card-3d" id="verificationCard">
-              <div class="card-glow-layer"></div>
-              <div class="card-3d-header">
-                <div class="stage-indicator">
-                  <span class="stage-num">4</span>
-                  <div>
-                    <h3>Tamper Verification</h3>
-                    <span class="stage-desc">Check data against blockchain record</span>
-                  </div>
-                </div>
-                <div class="badge-3d badge-green" id="verStatusBadge">
-                  Verified
                 </div>
               </div>
 
-              <div class="audit-banner-3d success" id="verBanner">
-                <div class="audit-icon-3d">
-                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                    <polyline points="9 12 11 14 15 10"/>
-                  </svg>
+              <!-- Stage 2: Web Match Card -->
+              <div class="card-box">
+                <div class="card-box-header">
+                  <div class="stage-indicator">
+                    <span class="stage-num">2</span>
+                    <div>
+                      <h3>Web Match</h3>
+                      <span class="stage-desc">Matching public profile or post</span>
+                    </div>
+                  </div>
+                  <div class="badge badge-blue" id="matchPlatformBadge">-</div>
                 </div>
-                <div class="audit-text">
-                  <h4 id="verTitle">Data Verified</h4>
-                  <p id="verDescription">
-                    The current data matches the blockchain record exactly.
-                  </p>
+
+                <div class="media-body">
+                  <div class="media-profile-header">
+                    <div class="media-avatar" id="authorAvatar">
+                      <img id="matchAvatarImg" class="media-avatar-img hidden" alt="Match Profile">
+                      <div id="matchAvatarPlaceholder" class="media-avatar-placeholder">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                          <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="media-profile-info">
+                      <h4 id="authorName">-</h4>
+                      <span class="mono" id="authorHandle">-</span>
+                    </div>
+                    <div class="sim-pill">
+                      <span class="sim-sub">SIMILARITY</span>
+                      <span class="sim-val" id="similarityScore">-</span>
+                    </div>
+                  </div>
+
+                  <!-- Optional Match Image Preview -->
+                  <div id="matchImagePreviewContainer" class="match-image-preview hidden">
+                    <img id="matchPreviewImg" src="" alt="Matched Post" class="match-preview-img" onerror="this.parentElement.classList.add('hidden')">
+                    <div class="match-preview-overlay">
+                      <span class="match-preview-tag" id="matchPreviewTag">Matched Web Image</span>
+                      <a id="matchPreviewLink" href="#" target="_blank" class="preview-external-link">View Source ↗</a>
+                    </div>
+                  </div>
+
+                  <p class="media-caption" id="postCaption">-</p>
+
+                  <div class="media-footer">
+                    <div class="media-actions-left">
+                      <a id="postUrlLink" href="#" target="_blank" class="post-source-link">
+                        <span>Open Source Post</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                          <polyline points="15 3 21 3 21 9"></polyline>
+                          <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                      </a>
+                      <button type="button" id="btnToggleCandidates" class="btn-toggle-candidates hidden">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <rect x="3" y="3" width="7" height="7"></rect>
+                          <rect x="14" y="3" width="7" height="7"></rect>
+                          <rect x="14" y="14" width="7" height="7"></rect>
+                          <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        <span>All Matches (<span id="candidatesCount">0</span>)</span>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="chevron-icon">
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                      </button>
+                      <button type="button" id="btnFilterSocial" class="btn-filter-social hidden">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                          <circle cx="9" cy="7" r="4"/>
+                          <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                        <span>Social Media (<span id="socialCandidatesCount">0</span>)</span>
+                      </button>
+                    </div>
+                    <span class="post-timestamp" id="postTimestamp">-</span>
+                  </div>
+
+                  <!-- Top Candidates Expandable Drawer -->
+                  <div id="candidatesDrawer" class="candidates-drawer hidden">
+                    <div class="candidates-drawer-header">
+                      <div>
+                        <div class="drawer-title" id="drawerTitle">All Web Matches Ranked by Face Similarity</div>
+                        <div class="drawer-subtitle" id="drawerSubtitle">Candidates discovered via Google Lens & Yandex</div>
+                      </div>
+                      <div class="candidates-filter-group">
+                        <button type="button" class="filter-tab-btn active" id="filterTabAll" data-filter="all">All (<span id="countTabAll">0</span>)</button>
+                        <button type="button" class="filter-tab-btn" id="filterTabSocial" data-filter="social">Social Media (<span id="countTabSocial">0</span>)</button>
+                      </div>
+                    </div>
+                    <!-- Dynamic Platform Sub-filters -->
+                    <div id="socialPlatformFilterRow" class="social-platform-filters hidden"></div>
+                    <div id="candidatesGrid" class="candidates-grid"></div>
+                  </div>
                 </div>
               </div>
 
-              <!-- Interactive Tamper Testing Control -->
-              <div class="tamper-control-3d">
-                <div class="tamper-info">
-                  <strong>Test Tamper Detection</strong>
-                  <p>Simulate modifying data to see if the blockchain detects tampering.</p>
+              <!-- Stage 3: Blockchain Attestation Card -->
+              <div class="card-box">
+                <div class="card-box-header">
+                  <div class="stage-indicator">
+                    <span class="stage-num">3</span>
+                    <div>
+                      <h3>Blockchain Attestation</h3>
+                      <span class="stage-desc">Cryptographic anchor & verified receipt</span>
+                    </div>
+                  </div>
+                  <div class="badge badge-purple" id="txStatusBadge">Confirmed</div>
                 </div>
-                <button id="btnTamperTest" class="btn-tamper-3d">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                    <line x1="12" y1="9" x2="12" y2="13"/>
-                    <line x1="12" y1="17" x2="12.01" y2="17"/>
-                  </svg>
-                  <span>Simulate Tampering</span>
-                </button>
+
+                <div class="blockchain-grid">
+                  <div class="data-cell">
+                    <span class="cell-label">Transaction Hash</span>
+                    <span class="cell-data mono truncate" id="txHashVal">-</span>
+                  </div>
+                  <div class="data-cell">
+                    <span class="cell-label">Block Number</span>
+                    <span class="cell-data mono" id="blockNumberVal">-</span>
+                  </div>
+                  <div class="data-cell">
+                    <span class="cell-label">Smart Contract</span>
+                    <span class="cell-data mono truncate" id="contractVal">-</span>
+                  </div>
+                  <div class="data-cell">
+                    <span class="cell-label">Submitter</span>
+                    <span class="cell-data mono truncate" id="submitterVal">-</span>
+                  </div>
+                  <div class="data-cell full-width">
+                    <span class="cell-label">Face Hash (Keccak-256)</span>
+                    <span class="cell-data mono truncate" id="faceHashVal">-</span>
+                  </div>
+                  <div class="data-cell full-width">
+                    <span class="cell-label">Payload Hash (Keccak-256)</span>
+                    <span class="cell-data mono truncate" id="payloadHashVal">-</span>
+                  </div>
+                </div>
               </div>
 
-              <div id="tamperDiffContainer" class="tamper-table-wrap hidden"></div>
+              <!-- Stage 4: Tamper Verification Card -->
+              <div class="card-box" id="verificationCard">
+                <div class="card-box-header">
+                  <div class="stage-indicator">
+                    <span class="stage-num">4</span>
+                    <div>
+                      <h3>Tamper Verification</h3>
+                      <span class="stage-desc">Check data against blockchain record</span>
+                    </div>
+                  </div>
+                  <div class="badge badge-green" id="verStatusBadge">Verified</div>
+                </div>
+
+                <div class="audit-banner success" id="verBanner">
+                  <div class="audit-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                      <polyline points="9 12 11 14 15 10"/>
+                    </svg>
+                  </div>
+                  <div class="audit-text">
+                    <h4 id="verTitle">Data Verified</h4>
+                    <p id="verDescription">The current data matches the blockchain record exactly.</p>
+                  </div>
+                </div>
+
+                <!-- Interactive Tamper Testing Control -->
+                <div class="tamper-control">
+                  <div class="tamper-info">
+                    <strong>Test Tamper Detection</strong>
+                    <p>Simulate modifying data to see if the blockchain detects tampering.</p>
+                  </div>
+                  <button id="btnTamperTest" class="btn-tamper">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                      <line x1="12" y1="9" x2="12" y2="13"/>
+                      <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <span>Simulate Tampering</span>
+                  </button>
+                </div>
+
+                <div id="tamperDiffContainer" class="tamper-table-wrap hidden"></div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
       </div>
       <!-- End Tab Panel 1: Pipeline -->
 
       <!-- Tab Panel 2: Verification History -->
       <div id="tabContentHistory" class="tab-content-panel hidden">
-        <section class="ledger-card-3d">
-          <div class="ledger-header-3d">
+        <section class="card-box ledger-card">
+          <div class="card-box-header">
             <div>
               <h3>Verification History</h3>
-              <p>Recent records stored on the blockchain</p>
+              <span class="stage-desc">Recent records stored on the blockchain</span>
             </div>
-            <button id="btnRefreshHistory" class="btn-refresh-3d">
+            <button id="btnRefreshHistory" class="btn-refresh">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="23 4 23 10 17 10"/>
                 <polyline points="1 20 1 14 7 14"/>
@@ -535,8 +416,8 @@
             </button>
           </div>
 
-          <div class="table-3d-frame">
-            <table class="table-3d">
+          <div class="table-frame">
+            <table class="data-table">
               <thead>
                 <tr>
                   <th>ID</th>
@@ -551,7 +432,7 @@
               </thead>
               <tbody id="historyTableBody">
                 <tr>
-                  <td colspan="8" class="table-loading-3d">Loading verification history...</td>
+                  <td colspan="8" class="table-loading">Loading verification history...</td>
                 </tr>
               </tbody>
             </table>
@@ -561,19 +442,19 @@
       <!-- End Tab Panel 2: History -->
     </main>
 
-    <!-- Footer -->
-    <footer class="footer-3d">
+    <!-- Clean Minimal Footer -->
+    <footer class="footer">
       <div class="footer-inner">
-        <span>Face Identification & Blockchain Verification Pipeline</span>
+        <span>Face Verification & Blockchain Attestation Engine</span>
         <div class="footer-tags">
           <span class="tag-pill">EVM Blockchain</span>
           <span class="tag-pill">Tamper Detection</span>
-          <span class="tag-pill">Biometric Verification</span>
+          <span class="tag-pill">ArcFace Biometrics</span>
         </div>
       </div>
     </footer>
   </div>
 
-  <script src="/static/app.js?v=20260904_12"></script>
+  <script src="/static/app.js?v=20260904_18"></script>
 </body>
 </html>

@@ -62,10 +62,58 @@ class SocialPostParser:
             return "LinkedIn"
         elif "instagram.com" in domain:
             return "Instagram"
+        elif "facebook.com" in domain or "fb.com" in domain or "fb.watch" in domain:
+            return "Facebook"
+        elif "youtube.com" in domain or "youtu.be" in domain:
+            return "YouTube"
+        elif "tiktok.com" in domain or "douyin.com" in domain:
+            return "TikTok"
         elif "reddit.com" in domain:
             return "Reddit"
+        elif "pinterest.com" in domain:
+            return "Pinterest"
+        elif "threads.net" in domain:
+            return "Threads"
+        elif "snapchat.com" in domain:
+            return "Snapchat"
+        elif "t.me" in domain or "telegram.org" in domain:
+            return "Telegram"
+        elif "whatsapp.com" in domain or "wa.me" in domain:
+            return "WhatsApp"
+        elif "vk.com" in domain or "vkontakte.ru" in domain:
+            return "VK"
         elif "github.com" in domain:
             return "GitHub"
+        elif "gitlab.com" in domain:
+            return "GitLab"
+        elif "medium.com" in domain:
+            return "Medium"
+        elif "tumblr.com" in domain:
+            return "Tumblr"
+        elif "bsky.app" in domain or "bsky.social" in domain:
+            return "Bluesky"
+        elif "mastodon" in domain:
+            return "Mastodon"
+        elif "discord.com" in domain or "discord.gg" in domain:
+            return "Discord"
+        elif "twitch.tv" in domain:
+            return "Twitch"
+        elif "quora.com" in domain:
+            return "Quora"
+        elif "wechat.com" in domain or "weixin.qq.com" in domain:
+            return "WeChat"
+        elif "weibo.com" in domain or "weibo.cn" in domain:
+            return "Weibo"
+        elif "xiaohongshu.com" in domain:
+            return "Xiaohongshu"
+        elif "bilibili.com" in domain:
+            return "Bilibili"
+        elif "doximity.com" in domain:
+            return "Doximity"
+        elif "researchgate.net" in domain:
+            return "ResearchGate"
+        elif "orcid.org" in domain:
+            return "ORCID"
         elif "wikipedia.org" in domain:
             return "Wikipedia"
         return "Web"
