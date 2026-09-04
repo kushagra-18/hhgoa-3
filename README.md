@@ -115,10 +115,14 @@ docker compose up --build -d
 - `app`: FastAPI web server & pipeline on `http://localhost:8090` (internal `8000`).
 
 ### 3. Open the Web Dashboard
-Navigate to **`http://localhost:8090`** (or `http://localhost:8000` if running locally without Docker) in your browser:
+Navigate to **`https://face.localhost`** (via Portless) or **`http://localhost:8090`** in your browser:
+- **Portless Named URL**: `https://face.localhost` (or `https://face.localhost:1355` in unprivileged mode).
 - Upload any face photo or click one of the pre-loaded test profiles.
 - Click **"Execute End-to-End Pipeline"** to watch the 4-step process live.
 - Click **"⚡ Simulate Malicious Data Alteration"** to demonstrate blockchain tamper-evidence live on screen!
+
+> [!TIP]
+> **Portless Setup**: This repository includes [`portless.json`](portless.json). To bind the standard port `443` so you can access `https://face.localhost` cleanly without a port number, run `sudo portless proxy start`.
 
 ---
 
