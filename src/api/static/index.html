@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="/static/style.css?v=20260904_18">
+  <link rel="stylesheet" href="/static/style.css?v=20260904_20">
 </head>
 <body class="clean-dark-theme">
   <div class="app-layout">
@@ -440,6 +440,26 @@
         </section>
       </div>
       <!-- End Tab Panel 2: History -->
+
+      <!-- Cryptographic Tamper Audit Modal -->
+      <div id="tamperModal" class="tamper-modal-backdrop hidden">
+        <div class="tamper-modal-dialog">
+          <div class="tamper-modal-header">
+            <div class="tamper-modal-title-group">
+              <h3 id="tamperModalTitle">Tamper-Evidence Proof</h3>
+              <span id="tamperModalSubtitle" class="tamper-modal-subtitle">Blockchain Verification vs Malicious Modification Test</span>
+            </div>
+            <button id="btnTamperModalClose" class="tamper-modal-close" aria-label="Close">&times;</button>
+          </div>
+          <div id="tamperModalBody" class="tamper-modal-body">
+            <!-- Dynamic proof table will be rendered here -->
+          </div>
+          <div class="tamper-modal-footer">
+            <button id="btnTamperModalInspect" class="btn-modal-action secondary">Inspect in Pipeline</button>
+            <button id="btnTamperModalDone" class="btn-modal-action primary">Close</button>
+          </div>
+        </div>
+      </div>
     </main>
 
     <!-- Clean Minimal Footer -->
@@ -455,6 +475,6 @@
     </footer>
   </div>
 
-  <script src="/static/app.js?v=20260904_18"></script>
+  <script src="/static/app.js?v=20260904_20"></script>
 </body>
 </html>

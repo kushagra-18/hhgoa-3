@@ -1556,4 +1556,254 @@ body {
   color: var(--text-secondary);
 }
 
+/* =========================================================================
+   History Table Action Button
+   ========================================================================= */
+.btn-action-tamper,
+.btn-verify-row-3d,
+.btn-row-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-base);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-action-tamper:hover,
+.btn-verify-row-3d:hover,
+.btn-row-action:hover {
+  background: var(--bg-hover);
+  border-color: #6366f1;
+  color: #fff;
+}
+
+.btn-action-tamper:active,
+.btn-verify-row-3d:active,
+.btn-row-action:active {
+  transform: translateY(1px);
+}
+
+.btn-action-tamper:disabled,
+.btn-verify-row-3d:disabled,
+.btn-row-action:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================================================================
+   Tamper Proof Modal
+   ========================================================================= */
+.tamper-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.tamper-modal-backdrop.hidden {
+  display: none !important;
+}
+
+.tamper-modal-dialog {
+  background: var(--bg-card);
+  border: 1px solid var(--border-base);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 680px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalFadeIn {
+  from {
+    transform: scale(0.96) translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.tamper-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-base);
+  background: var(--bg-input);
+}
+
+.tamper-modal-title-group h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.tamper-modal-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.tamper-modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s ease;
+}
+
+.tamper-modal-close:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.tamper-modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.tamper-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border-base);
+  background: var(--bg-navbar);
+}
+
+.btn-modal-action {
+  font-family: var(--font-main);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-modal-action.primary {
+  background: #3b82f6;
+  border: 1px solid #2563eb;
+  color: #fff;
+}
+
+.btn-modal-action.primary:hover {
+  background: #2563eb;
+}
+
+.btn-modal-action.secondary {
+  background: var(--bg-input);
+  border: 1px solid var(--border-base);
+  color: var(--text-primary);
+}
+
+.btn-modal-action.secondary:hover {
+  background: var(--bg-hover);
+  border-color: #6366f1;
+}
+
+.proof-card {
+  border: 1px solid var(--border-base);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  background: var(--bg-input);
+}
+
+.proof-card.valid {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.proof-card.tampered {
+  border-color: rgba(244, 63, 94, 0.4);
+  background: rgba(244, 63, 94, 0.05);
+}
+
+.proof-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.proof-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.proof-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+.proof-badge.badge-valid {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.proof-badge.badge-tampered {
+  background: rgba(244, 63, 94, 0.2);
+  color: #fb7185;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+.proof-hashes {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 6px 12px;
+  font-size: 11px;
+}
+
+.proof-label {
+  color: var(--text-muted);
+}
+
+.proof-val {
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
+.tamper-diff-list {
+  background: rgba(244, 63, 94, 0.08);
+  border: 1px solid rgba(244, 63, 94, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 12px;
+}
+
 .hidden { display: none !important; }
